@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Focus Hub - Deep concentration mode with ambient music, productivity tools, and distraction-free content to help you achieve flow state.">
+    <meta name="keywords" content="focus, concentration, productivity, pomodoro, ambient music, deep work">
+    <meta name="author" content="FlowState">
+    <meta name="theme-color" content="#D93535">
+    
+    <title>Focus Hub - FlowState</title>
+    
+   
+    <link rel="preconnect" href="https://api.spotify.com">
+    <link rel="preconnect" href="https://api.themoviedb.org">
+    <link rel="preconnect" href="https://itch.io">
+    
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/hub.css">
+    
+    <!-- GSAP  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    
+    <!-- scripts -->
+    <script src="js/navigation.js" defer></script>
+    <script src="js/timer.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/hub.js" defer></script>
+    <script src="js/animations.js" defer></script>
+</head>
+<body class="hub-page" data-hub="focus">
+  
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- side Navigation Panel -->
+    <aside class="side-nav" id="side-navigation" aria-label="Hub navigation">
+        <button class="side-nav__toggle" aria-expanded="false" aria-controls="side-nav-menu" aria-label="Toggle hub navigation">
+            <span class="side-nav__hamburger"></span>
+        </button>
+        
+        <nav class="side-nav__menu" id="side-nav-menu">
+            <h2 class="visually-hidden">Navigate to Other Hubs</h2>
+            <ul class="side-nav__list">
+                <li class="side-nav__item side-nav__item--active">
+                    <a href="focus.html" class="side-nav__link" aria-current="page">
+                        <span class="side-nav__icon" aria-hidden="true">⬢</span>
+                        <span class="side-nav__text">Focus</span>
+                    </a>
+                </li>
+                <li class="side-nav__item">
+                    <a href="relax.html" class="side-nav__link">
+                        <span class="side-nav__icon" aria-hidden="true">◯</span>
+                        <span class="side-nav__text">Relax</span>
+                    </a>
+                </li>
+                <li class="side-nav__item">
+                    <a href="energize.html" class="side-nav__link">
+                        <span class="side-nav__icon" aria-hidden="true">▲</span>
+                        <span class="side-nav__text">Energize</span>
+                    </a>
+                </li>
+                <li class="side-nav__item">
+                    <a href="creative.html" class="side-nav__link">
+                        <span class="side-nav__icon" aria-hidden="true">✦</span>
+                        <span class="side-nav__text">Creative</span>
+                    </a>
+                </li>
+                <li class="side-nav__item">
+                    <a href="melancholy.html" class="side-nav__link">
+                        <span class="side-nav__icon" aria-hidden="true">◇</span>
+                        <span class="side-nav__text">Melancholy</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Navigation -->
+    <nav id="main-navigation" aria-label="Main navigation">
+      
+    </nav>
+
+    <!-- pomodoro Timer Widget -->
+    <aside class="timer-widget" aria-label="Pomodoro timer">
+        <div class="timer-widget__container">
+            <svg class="timer-widget__progress" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="timer-widget__progress-bg" cx="60" cy="60" r="54" />
+                <circle class="timer-widget__progress-fill" cx="60" cy="60" r="54" />
+            </svg>
+            
+            <div class="timer-widget__content">
+                <div class="timer-widget__display" aria-live="polite" aria-atomic="true">
+                    <span class="timer-widget__time">25:00</span>
+                </div>
+                <div class="timer-widget__status">Work Session</div>
+            </div>
+            
+            <div class="timer-widget__controls">
+                <button class="timer-widget__btn timer-widget__btn--start" aria-label="Start timer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                </button>
+                <button class="timer-widget__btn timer-widget__btn--pause" aria-label="Pause timer" hidden>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                </button>
+                <button class="timer-widget__btn timer-widget__btn--reset" aria-label="Reset timer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hub-hero" aria-labelledby="hub-title">
+            <div class="hub-hero__content">
+                <h1 id="hub-title" class="hub-hero__title">FOCUS HUB</h1>
+                <p class="hub-hero__description">
+                    Deep concentration mode with ambient music, productivity tools, and distraction-free content to help you achieve flow state. Perfect for deep work sessions and intense focus periods.
+                </p>
+            </div>
+            <div class="hub-hero__atmosphere" aria-hidden="true"></div>
+        </section>
+
+        <!-- Filter Navigation -->
+        <nav class="filter-nav" aria-label="Content filter">
+            <ul class="filter-nav__list">
+                <li class="filter-nav__item">
+                    <button class="filter-nav__btn filter-nav__btn--active" data-filter="all" aria-pressed="true">
+                        All
+                    </button>
+                </li>
+                <li class="filter-nav__item">
+                    <button class="filter-nav__btn" data-filter="music" aria-pressed="false">
+                        Music
+                    </button>
+                </li>
+                <li class="filter-nav__item">
+                    <button class="filter-nav__btn" data-filter="movies" aria-pressed="false">
+                        Movies
+                    </button>
+                </li>
+                <li class="filter-nav__item">
+                    <button class="filter-nav__btn" data-filter="games" aria-pressed="false">
+                        Games
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Music Content Section -->
+        <section id="music-section" class="content-section" aria-labelledby="music-heading" data-category="music">
+            <header class="content-section__header">
+                <h2 id="music-heading" class="content-section__title">Focus Music</h2>
+                <p class="content-section__subtitle">Instrumental and ambient tracks to enhance concentration</p>
+            </header>
+            
+            <div class="content-grid content-grid--music" role="list">
+                <!-- music cards will be injected by js -->
+                <div class="loading-state" aria-live="polite" aria-busy="true">
+                    <div class="loading-spinner" aria-hidden="true"></div>
+                    <p>Loading music recommendations...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Movies Content Section -->
+        <section id="movies-section" class="content-section" aria-labelledby="movies-heading" data-category="movies">
+            <header class="content-section__header">
+                <h2 id="movies-heading" class="content-section__title">Focus-Friendly Content</h2>
+                <p class="content-section__subtitle">Educational documentaries and inspiring content for your breaks</p>
+            </header>
+            
+            <div class="content-grid content-grid--movies" role="list">
+                <!-- Movies by js -->
+                <div class="loading-state" aria-live="polite" aria-busy="true">
+                    <div class="loading-spinner" aria-hidden="true"></div>
+                    <p>Loading movie recommendations...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Games Content Section -->
+        <section id="games-section" class="content-section" aria-labelledby="games-heading" data-category="games">
+            <header class="content-section__header">
+                <h2 id="games-heading" class="content-section__title">Focus Games</h2>
+                <p class="content-section__subtitle">Logic puzzles and memory games for mental breaks</p>
+            </header>
+            
+            <div class="content-grid content-grid--games" role="list">
+                <!-- games cards will be  by js -->
+                <div class="loading-state" aria-live="polite" aria-busy="true">
+                    <div class="loading-spinner" aria-hidden="true"></div>
+                    <p>Loading game recommendations...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__content">
+            <p class="footer__text">&copy; 2025 FlowState. Find Your Perfect Work Vibe.</p>
+            <nav class="footer__nav" aria-label="Footer navigation">
+                <ul class="footer__links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+</body>
+</html>

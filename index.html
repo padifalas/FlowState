@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FlowState - A dynamic, mood-driven productivity platform where users discover personalized content based on their current emotional state, enhanced with integrated Pomodoro timer for focused work sessions.">
+    <meta name="keywords" content="productivity, pomodoro timer, mood-based content, focus, relaxation, music playlists, movie recommendations, productivity tools">
+    <meta name="author" content="Padi Falas Maifala; FlowState">
+    <meta name="theme-color" content="#282D35">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="FlowState - Mood-Based Productivity Hub">
+    <meta property="og:description" content="Discover personalized content and boost productivity with our mood-driven platform featuring integrated Pomodoro timer.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://flowstate.app">
+    
+    
+    <title>FlowState - Your Perfect Work Vibe</title>
+    
+   
+    <link rel="preconnect" href="https://api.spotify.com">
+    <link rel="preconnect" href="https://api.themoviedb.org">
+    <link rel="preconnect" href="https://itch.io">
+    
+    <!-- css -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- GSAP library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    
+    <!-- javascripts -->
+    <script src="js/navigation.js" defer></script>
+    <script src="js/animations.js" defer></script>
+    <script src="js/main.js" defer></script>
+</head>
+<body>
+ 
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- will use js to generate nav content -->
+    <nav id="main-navigation" aria-label="Main navigation">
+      
+    </nav>
+
+
+    <main id="main-content">
+     
+        <section class="hero" aria-labelledby="hero-heading">
+            <div class="hero__content">
+                <h1 id="hero-heading" class="hero__title">
+                    <span class="hero__title-line">FINDING YOUR PERFECT</span>
+                    <span class="hero__title-accent">WORK VIBE</span>
+                </h1>
+                <p class="hero__subtitle">A Productivity Journey Awaits</p>
+                <a href="#mood-hubs" class="hero__cta" aria-label="Get started with FlowState">
+                    Quick Start
+                </a>
+            </div>
+            
+      
+            <div class="hero__particles" aria-hidden="true"></div>
+            
+          
+            <div class="hero__scroll-indicator" aria-hidden="true">
+                <span class="hero__scroll-text">SCROLL</span>
+                <svg class="hero__scroll-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+   
+        <section id="about" class="about" aria-labelledby="about-heading">
+            <div class="about__container">
+                <h2 id="about-heading" class="about__title">What is FlowState?</h2>
+                <div class="about__content">
+                    <p class="about__intro">
+                        FlowState is a mood-driven productivity platform that adapts to your emotional state, helping you work smarter and feel better throughout your day.
+                    </p>
+                    
+                    <div class="about__features">
+                        <article class="feature">
+                            <h3 class="feature__title">Mood-Based Discovery</h3>
+                            <p class="feature__description">
+                                Select your current emotional state and receive curated music, movies, and games tailored to enhance your productivity and wellbeing.
+                            </p>
+                        </article>
+                        
+                        <article class="feature">
+                            <h3 class="feature__title">Integrated Pomodoro Timer</h3>
+                            <p class="feature__description">
+                                Stay focused with our built-in timer that syncs with your chosen mood, suggesting appropriate break activities and maintaining flow.
+                            </p>
+                        </article>
+                        
+                        <article class="feature">
+                            <h3 class="feature__title">Personalized Content</h3>
+                            <p class="feature__description">
+                                Access curated playlists from Spotify, movie recommendations from TMDB, and engaging games from Itch.io - all filtered for your current state.
+                            </p>
+                        </article>
+                    </div>
+                    
+                    <div class="about__how-it-works">
+                        <h3 class="about__subtitle">How It Works</h3>
+                        <ol class="about__steps">
+                            <li class="about__step">
+                                <strong>Choose Your Mood</strong> - Select from Focus, Relax, Energize, Creative, or Melancholy
+                            </li>
+                            <li class="about__step">
+                                <strong>Start Your Session</strong> - Set up your Pomodoro timer and browse curated content
+                            </li>
+                            <li class="about__step">
+                                <strong>Stay in Flow</strong> - Work with focus music, take breaks with recommended activities
+                            </li>
+                            <li class="about__step">
+                                <strong>Switch as Needed</strong> - Seamlessly transition between mood hubs as your day evolves
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- mood Hubs -->
+        <section id="mood-hubs" class="mood-hubs" aria-labelledby="hubs-heading">
+            <h2 id="hubs-heading" class="visually-hidden">Choose Your Mood Hub</h2>
+            
+            <!-- focus Hub Card -->
+            <article class="hub-card" data-hub="focus">
+                <div class="hub-card__number" aria-hidden="true">01</div>
+                <div class="hub-card__content">
+                    <h3 class="hub-card__title">Focus Hub</h3>
+                    <p class="hub-card__description">
+                        Deep concentration mode with ambient music, productivity tools, and distraction-free content to help you achieve flow state.
+                    </p>
+                    <a href="focus.html" class="hub-card__link" aria-label="Enter Focus Hub">
+                        Enter Hub
+                        <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hub-card__atmosphere" aria-hidden="true"></div>
+            </article>
+
+            <!-- relax Hub  -->
+            <article class="hub-card" data-hub="relax">
+                <div class="hub-card__number" aria-hidden="true">02</div>
+                <div class="hub-card__content">
+                    <h3 class="hub-card__title">Relax Hub</h3>
+                    <p class="hub-card__description">
+                        Unwind with calming music, meditation guides, and peaceful content designed to restore your energy and reduce stress.
+                    </p>
+                    <a href="relax.html" class="hub-card__link" aria-label="Enter Relax Hub">
+                        Enter Hub
+                        <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hub-card__atmosphere" aria-hidden="true"></div>
+            </article>
+
+            <!-- energize Hub  -->
+            <article class="hub-card" data-hub="energize">
+                <div class="hub-card__number" aria-hidden="true">03</div>
+                <div class="hub-card__content">
+                    <h3 class="hub-card__title">Energize Hub</h3>
+                    <p class="hub-card__description">
+                        Boost your motivation with upbeat music, inspiring content, and high-energy activities to power through your tasks.
+                    </p>
+                    <a href="energize.html" class="hub-card__link" aria-label="Enter Energize Hub">
+                        Enter Hub
+                        <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hub-card__atmosphere" aria-hidden="true"></div>
+            </article>
+
+            <!-- creative Hub  -->
+            <article class="hub-card" data-hub="creative">
+                <div class="hub-card__number" aria-hidden="true">04</div>
+                <div class="hub-card__content">
+                    <h3 class="hub-card__title">Creative Hub</h3>
+                    <p class="hub-card__description">
+                        Spark innovation with experimental music, artistic inspiration, and tools designed to unlock your creative potential.
+                    </p>
+                    <a href="creative.html" class="hub-card__link" aria-label="Enter Creative Hub">
+                        Enter Hub
+                        <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hub-card__atmosphere" aria-hidden="true"></div>
+            </article>
+
+            <!-- melancholly Hub  -->
+            <article class="hub-card" data-hub="melancholy">
+                <div class="hub-card__number" aria-hidden="true">05</div>
+                <div class="hub-card__content">
+                    <h3 class="hub-card__title">Melancholy Hub</h3>
+                    <p class="hub-card__description">
+                        Embrace introspection with contemplative music, thoughtful content, and reflective activities for deeper understanding.
+                    </p>
+                    <a href="melancholy.html" class="hub-card__link" aria-label="Enter Melancholy Hub">
+                        Enter Hub
+                        <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hub-card__atmosphere" aria-hidden="true"></div>
+            </article>
+        </section>
+    </main>
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="footer__content">
+            <p class="footer__text">&copy; 2025 FlowState. Find Your Perfect Work Vibe.</p>
+            <nav class="footer__nav" aria-label="Footer navigation">
+                <ul class="footer__links">
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#" aria-label="Privacy Policy">Privacy</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+</body>
+</html>
