@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact FlowState - Get in touch with us for feedback, feature requests, or collaboration opportunities.">
+    <meta name="keywords" content="contact, feedback, support, flowstate contact">
+    <meta name="author" content="FlowState">
+    <meta name="theme-color" content="#282D35">
+    
+    <title>Contact Us - FlowState</title>
+    
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="js/navigation.js" defer></script>
+    <script src="js/contact.js" defer></script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <nav id="main-navigation" aria-label="Main navigation"></nav>
+
+    <main id="main-content">
+        <section class="contact-hero" aria-labelledby="contact-title">
+            <div class="contact-hero__content">
+                <h1 id="contact-title" class="contact-hero__title">Get In Touch</h1>
+                <p class="contact-hero__description">
+                    We'd love to hear from you. Whether you have feedback, feature requests, or collaboration ideas, we're here to help you optimize your productivity journey.
+                </p>
+            </div>
+        </section>
+
+        <section class="contact-info">
+            <div class="contact-info__container">
+                <article class="contact-card">
+                    <h2 class="contact-card__title">Send Us a Message</h2>
+                    <p class="contact-card__text">
+                        Have questions or feedback about FlowState? Click below to open our contact form and we'll get back to you as soon as possible.
+                    </p>
+                    <button class="contact-card__btn" id="open-contact-modal" aria-label="Open contact form">
+                        Open Contact Form
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </article>
+
+                <article class="contact-card">
+                    <h2 class="contact-card__title">Join Our Community</h2>
+                    <p class="contact-card__text">
+                        Connect with other productivity enthusiasts and stay updated on FlowState features, tips, and best practices.
+                    </p>
+                    <div class="contact-card__links">
+                        <a href="#" class="contact-card__link" aria-label="Follow us on Twitter">
+                            <span>Twitter</span>
+                        </a>
+                        <a href="#" class="contact-card__link" aria-label="Join our Discord community">
+                            <span>Discord</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="contact-card">
+                    <h2 class="contact-card__title">FAQ</h2>
+                    <p class="contact-card__text">
+                        Looking for quick answers? Check out our frequently asked questions section for common queries about using FlowState.
+                    </p>
+                    <a href="#faq" class="contact-card__btn contact-card__btn--secondary">
+                        View FAQ
+                    </a>
+                </article>
+            </div>
+        </section>
+
+        <section id="faq" class="faq-section" aria-labelledby="faq-heading">
+            <div class="faq-section__container">
+                <h2 id="faq-heading" class="faq-section__title">Frequently Asked Questions</h2>
+                
+                <div class="faq-list">
+                    <article class="faq-item">
+                        <h3 class="faq-item__question">How does the Pomodoro timer work?</h3>
+                        <p class="faq-item__answer">
+                            Our Pomodoro timer follows the classic 25-minute work sessions followed by 5-minute breaks. After four sessions, you'll get a longer 15-minute break. The timer syncs with your chosen mood hub to suggest appropriate activities.
+                        </p>
+                    </article>
+
+                    <article class="faq-item">
+                        <h3 class="faq-item__question">Can I customize my timer settings?</h3>
+                        <p class="faq-item__answer">
+                            Yes! You can adjust work and break durations to fit your personal productivity style. Access the timer settings by clicking on the timer widget.
+                        </p>
+                    </article>
+
+                    <article class="faq-item">
+                        <h3 class="faq-item__question">How are content recommendations personalized?</h3>
+                        <p class="faq-item__answer">
+                            Content is curated based on your selected mood hub using our integrated APIs (Spotify, TMDB, Itch.io). Each hub filters content specifically for that emotional state and productivity need.
+                        </p>
+                    </article>
+
+                    <article class="faq-item">
+                        <h3 class="faq-item__question">Do I need accounts with Spotify or other services?</h3>
+                        <p class="faq-item__answer">
+                            While you can browse recommendations without accounts, you'll need respective platform accounts to play music on Spotify, watch content, or play games directly.
+                        </p>
+                    </article>
+
+                    <article class="faq-item">
+                        <h3 class="faq-item__question">Is FlowState free to use?</h3>
+                        <p class="faq-item__answer">
+                            Yes! FlowState is completely free. We provide curated content and productivity tools to help you achieve your best work without any cost.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+ 
+    <aside class="modal" id="contact-modal" aria-labelledby="modal-title" aria-hidden="true" role="dialog">
+        <div class="modal__overlay" id="modal-overlay"></div>
+        <div class="modal__container">
+            <header class="modal__header">
+                <h2 id="modal-title" class="modal__title">Contact FlowState</h2>
+                <button class="modal__close" id="close-modal" aria-label="Close contact form">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </header>
+
+            <form class="contact-form" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Full Name <span class="form-required" aria-label="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="form-input" 
+                        required 
+                        aria-required="true"
+                        aria-describedby="name-error"
+                    >
+                    <span class="form-error" id="name-error" role="alert"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Email Address <span class="form-required" aria-label="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        required 
+                        aria-required="true"
+                        aria-describedby="email-error"
+                    >
+                    <span class="form-error" id="email-error" role="alert"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject" class="form-label">
+                        Subject <span class="form-required" aria-label="required">*</span>
+                    </label>
+                    <select 
+                        id="subject" 
+                        name="subject" 
+                        class="form-input form-select" 
+                        required 
+                        aria-required="true"
+                        aria-describedby="subject-error"
+                    >
+                        <option value="">Select a subject</option>
+                        <option value="feedback">General Feedback</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="collaboration">Collaboration Opportunity</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <span class="form-error" id="subject-error" role="alert"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="message" class="form-label">
+                        Message <span class="form-required" aria-label="required">*</span>
+                    </label>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        class="form-input form-textarea" 
+                        rows="6" 
+                        required 
+                        aria-required="true"
+                        aria-describedby="message-error message-counter"
+                        maxlength="1000"
+                    ></textarea>
+                    <div class="form-meta">
+                        <span class="form-error" id="message-error" role="alert"></span>
+                        <span class="form-counter" id="message-counter" aria-live="polite">0 / 1000 characters</span>
+                    </div>
+                </div>
+
+                <!-- honeypott field for spamprotection -->
+                <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+                <div class="form-actions">
+                    <button type="submit" class="form-submit" id="form-submit">
+                        <span class="form-submit__text">Send Message</span>
+                        <span class="form-submit__loading" hidden>
+                            <span class="spinner" aria-hidden="true"></span>
+                            Sending...
+                        </span>
+                    </button>
+                    <button type="button" class="form-cancel" id="form-cancel">Cancel</button>
+                </div>
+
+                
+                <div class="form-success" id="form-success" hidden role="status" aria-live="polite">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <p>Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
+                </div>
+
+              
+                <div class="form-failure" id="form-failure" hidden role="alert" aria-live="assertive">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p>Sorry, something went wrong. Please try again later.</p>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    <footer class="footer">
+        <div class="footer__content">
+            <p class="footer__text">&copy; 2025 FlowState. Find Your Perfect Work Vibe.</p>
+            <nav class="footer__nav" aria-label="Footer navigation">
+                <ul class="footer__links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html" aria-current="page">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+</body>
+</html>
