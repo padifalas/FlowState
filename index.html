@@ -9,6 +9,9 @@
     <meta name="theme-color" content="#282D35">
     
 
+    <link rel="profile" href="http://microformats.org/profile/hcard">
+    <link rel="profile" href="http://microformats.org/profile/h-event">
+
     <meta property="og:title" content="FlowState - Mood-Based Productivity Hub">
     <meta property="og:description" content="Discover personalized content and boost productivity with our mood-driven platform featuring integrated Pomodoro timer.">
     <meta property="og:type" content="website">
@@ -16,7 +19,7 @@
     
     <title>FlowState - Your Perfect Work Vibe</title>
     
-    <!-- Preconnect to API domains for performance -->
+  
     <link rel="preconnect" href="https://api.spotify.com">
     <link rel="preconnect" href="https://api.themoviedb.org">
     <link rel="preconnect" href="https://itch.io">
@@ -57,10 +60,9 @@
                 </a>
             </div>
             
-            <!-- Particle container for GSAP animations -->
-            <div class="hero__particles" aria-hidden="true"></div>
+
             
-            <!-- Scroll indicator -->
+            <!-- scroll indicator -->
             <div class="hero__scroll-indicator" aria-hidden="true">
                 <span class="hero__scroll-text">SCROLL</span>
                 <svg class="hero__scroll-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -79,18 +81,20 @@
                     </p>
                     
                     <div class="about__features">
-                        <article class="feature">
-                            <h3 class="feature__title">Mood-Based Discovery</h3>
+                        <article class="feature h-event">
+                            <h3 class="feature__title p-name">Mood-Based Discovery</h3>
                             <p class="feature__description">
                                 Select your current emotional state and receive curated music, movies, and games tailored to enhance your productivity and wellbeing.
                             </p>
+                            <p class="p-summary">Personalized content discovery based on emotional state</p>
                         </article>
                         
-                        <article class="feature">
-                            <h3 class="feature__title">Integrated Pomodoro Timer</h3>
+                        <article class="feature h-event">
+                            <h3 class="feature__title p-name">Integrated Pomodoro Timer</h3>
                             <p class="feature__description">
                                 Stay focused with our built-in timer that syncs with your chosen mood, suggesting appropriate break activities and maintaining flow.
                             </p>
+                            <p class="p-summary">Focused work sessions with mood-synced breaks</p>
                         </article>
                         
                         <article class="feature">
@@ -125,8 +129,11 @@
         <!-- Mood Hubs Section -->
         <section id="mood-hubs" class="mood-hubs" aria-labelledby="hubs-heading">
                 <div class="mood-hubs-container" role="region" aria-label="Mood hubs carousel">
-                <h2 id="hubs-heading" class="visually-hidden">Choose Your Mood Hub</h2>
                 
+                 <h2 id="about-heading" class="about__title">Choose Your Mood Hub</h2>
+                 
+
+                <p class="about__intro">Each hub is designed around a specific emotional state, providing the perfect enviroment for different types of work and creativity</p>
                 <div class="mood-hubs-carousel" data-carousel="true">
                     <div class="mood-hubs-track" id="mood-hubs-track" role="list" aria-live="polite">
                         <!-- Focus Hub Card -->
@@ -144,7 +151,7 @@
                                     Deep concentration with ambient music and distraction-free tools.
                                 </p>
                             </div>
-                            <a href="focus.html" class="hub-card__link" aria-label="Enter Focus Hub">
+                            <a href="hubs/focus-hub/focus.html" class="hub-card__link" aria-label="Enter Focus Hub">
                                 Enter Hub
                                 <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -168,7 +175,7 @@
                                     Unwind with calming music and peaceful content to reduce stress.
                                 </p>
                             </div>
-                            <a href="relax.html" class="hub-card__link" aria-label="Enter Relax Hub">
+                            <a href="hubs/relax-hub/relax.html" class="hub-card__link" aria-label="Enter Relax Hub">
                                 Enter Hub
                                 <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -192,7 +199,7 @@
                                     Boost motivation with upbeat music and high-energy activities.
                                 </p>
                             </div>
-                            <a href="energize.html" class="hub-card__link" aria-label="Enter Energize Hub">
+                            <a href="hubs/energize-hub/energize.html" class="hub-card__link" aria-label="Enter Energize Hub">
                                 Enter Hub
                                 <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -216,7 +223,7 @@
                                     Spark innovation with experimental music and artistic inspiration.
                                 </p>
                             </div>
-                            <a href="creative.html" class="hub-card__link" aria-label="Enter Creative Hub">
+                            <a href="hubs/creative-hub/creative.html" class="hub-card__link" aria-label="Enter Creative Hub">
                                 Enter Hub
                                 <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -240,7 +247,7 @@
                                     Embrace introspection with contemplative music and reflective activities.
                                 </p>
                             </div>
-                            <a href="melancholy.html" class="hub-card__link" aria-label="Enter Melancholy Hub">
+                            <a href="hubs/melancholy-hub/melancholy.html" class="hub-card__link" aria-label="Enter Melancholy Hub">
                                 Enter Hub
                                 <svg class="hub-card__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -273,27 +280,21 @@
         </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer h-card">
         <div class="footer__content">
-            <p class="footer__text">&copy; 2025 FlowState. Find Your Perfect Work Vibe.</p>
+            <p class="footer__text">
+                &copy; <span id="copyright-year"></span> <span class="p-org">FlowState</span>. 
+                <span class="p-slogan">Find Your Perfect Work Vibe.</span>
+            </p>
             <nav class="footer__nav" aria-label="Footer navigation">
                 <ul class="footer__links">
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="#" aria-label="Privacy Policy">Privacy</a></li>
+                    <li><a href="index.html#about" class="u-url">About</a></li>
+                    <li><a href="contact.html" rel="me" class="u-email">Contact</a></li>
+                    
                 </ul>
             </nav>
         </div>
     </footer>
-    <!-- Visuals root: particle canvas, floating shapes, gradient overlays -->
-    <div id="visuals-root" class="visuals-root" aria-hidden="true">
-        <canvas id="visual-canvas" class="visuals-canvas"></canvas>
-        <div id="floating-shapes" class="floating-shapes" aria-hidden="true"></div>
-        <div class="gradient-overlay" aria-hidden="true"></div>
-        <!-- ambient lights (example positions) -->
-        <div class="ambient-light light--red" style="width:420px;height:420px;left:5%;top:10%;"></div>
-        <div class="ambient-light light--coral" style="width:360px;height:360px;right:10%;top:40%;"></div>
-    </div>
 
     <script src="js/visuals.js" defer></script>
 </body>

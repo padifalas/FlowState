@@ -8,6 +8,10 @@
     <meta name="author" content="FlowState">
     <meta name="theme-color" content="#282D35">
     
+    <!-- Microformat profiles -->
+    <link rel="profile" href="http://microformats.org/profile/hcard">
+    <link rel="profile" href="http://microformats.org/profile/h-entry">
+    
     <title>Contact Us - FlowState</title>
     
     <link rel="stylesheet" href="css/styles.css">
@@ -52,11 +56,11 @@
                     <p class="contact-card__text">
                         Connect with other productivity enthusiasts and stay updated on FlowState features, tips, and best practices.
                     </p>
-                    <div class="contact-card__links">
-                        <a href="#" class="contact-card__link" aria-label="Follow us on Twitter">
+                    <div class="contact-card__links h-card">
+                        <a href="#" class="contact-card__link u-url" rel="me" aria-label="Follow us on Twitter">
                             <span>Twitter</span>
                         </a>
-                        <a href="#" class="contact-card__link" aria-label="Join our Discord community">
+                        <a href="#" class="contact-card__link u-url" rel="me" aria-label="Join our Discord community">
                             <span>Discord</span>
                         </a>
                     </div>
@@ -79,9 +83,9 @@
                 <h2 id="faq-heading" class="faq-section__title">Frequently Asked Questions</h2>
                 
                 <div class="faq-list">
-                    <article class="faq-item">
-                        <h3 class="faq-item__question">How does the Pomodoro timer work?</h3>
-                        <p class="faq-item__answer">
+                    <article class="faq-item h-entry">
+                        <h3 class="faq-item__question p-name">How does the Pomodoro timer work?</h3>
+                        <p class="faq-item__answer e-content">
                             Our Pomodoro timer follows the classic 25-minute work sessions followed by 5-minute breaks. After four sessions, you'll get a longer 15-minute break. The timer syncs with your chosen mood hub to suggest appropriate activities.
                         </p>
                     </article>
@@ -132,7 +136,7 @@
                 </button>
             </header>
 
-            <form class="contact-form" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+            <form class="contact-form h-card" id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
                 <div class="form-group">
                     <label for="name" class="form-label">
                         Full Name <span class="form-required" aria-label="required">*</span>
@@ -141,7 +145,7 @@
                         type="text" 
                         id="name" 
                         name="name" 
-                        class="form-input" 
+                        class="form-input p-name" 
                         required 
                         aria-required="true"
                         aria-describedby="name-error"
@@ -157,7 +161,7 @@
                         type="email" 
                         id="email" 
                         name="email" 
-                        class="form-input" 
+                        class="form-input u-email" 
                         required 
                         aria-required="true"
                         aria-describedby="email-error"
@@ -242,14 +246,17 @@
         </div>
     </aside>
 
-    <footer class="footer">
+    <footer class="footer h-card">
         <div class="footer__content">
-            <p class="footer__text">&copy; 2025 FlowState. Find Your Perfect Work Vibe.</p>
+            <p class="footer__text">
+                &copy; 2025 <span class="p-org">FlowState</span>. 
+                <span class="p-slogan">Find Your Perfect Work Vibe.</span>
+            </p>
             <nav class="footer__nav" aria-label="Footer navigation">
                 <ul class="footer__links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html" aria-current="page">Contact</a></li>
+                    <li><a href="index.html" class="u-url">Home</a></li>
+                    <li><a href="about.html" class="u-url">About</a></li>
+                    <li><a href="contact.html" class="u-url" rel="me" aria-current="page">Contact</a></li>
                 </ul>
             </nav>
         </div>
