@@ -252,6 +252,37 @@ ul {
     width: 100%;
 }
 
+/* Hamburger toggle button (hidden on desktop) */
+.nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 40px;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.nav-toggle__bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-text-secondary);
+    margin: 3px 0;
+    transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.nav-toggle.is-open .nav-toggle__bar:nth-of-type(2) {
+    opacity: 0;
+}
+.nav-toggle.is-open .nav-toggle__bar:nth-of-type(1) {
+    transform: translateY(5px) rotate(45deg);
+}
+.nav-toggle.is-open .nav-toggle__bar:nth-of-type(3) {
+    transform: translateY(-5px) rotate(-45deg);
+}
+
 /* Mobile Navigation Toggle (for future mobile menu) */
 @media (max-width: 768px) {
     .nav-links {
@@ -869,6 +900,77 @@ ul {
     .footer__content {
         flex-direction: column;
         text-align: center;
+    }
+
+ 
+    .nav-toggle {
+        display: inline-flex;
+        z-index: 1100;
+        color: var(--color-text-primary);
+    }
+
+    /* animated dropdown panel */
+    .nav-links {
+        display: flex; 
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(18,20,24,0.98);
+        backdrop-filter: blur(8px);
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(240,236,217,0.04);
+        box-shadow: var(--shadow-md);
+
+        /* hidden state - usess transform & opacity to animate smoothly */
+        transform-origin: top center;
+        transform: translateY(-6%) scaleY(0.98);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 360ms cubic-bezier(.2,.9,.3,1), opacity 240ms cubic-bezier(.2,.9,.3,1);
+    }
+
+    .nav-links.open {
+        transform: translateY(0) scaleY(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .nav-links .nav-item {
+        padding: 0.5rem 0;
+        /* children animate in with slight upward motion */
+        transform: translateY(-6px);
+        opacity: 0;
+        transition: transform 360ms cubic-bezier(.2,.9,.3,1), opacity 300ms ease;
+    }
+
+    /* when open, child items will animate to place  */
+    .nav-links.open .nav-item {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .nav-links .nav-link {
+        font-size: 1.05rem;
+        color: var(--color-text-primary);
+    }
+
+    /* fullscreen overlay behind the menu to dim content and capture clicks */
+    .nav-overlay {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.25));
+        z-index: 1050;
+        opacity: 0;
+        transition: opacity 260ms ease;
+        pointer-events: none;
+    }
+
+    .nav-overlay.is-visible {
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 

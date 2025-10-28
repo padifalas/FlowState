@@ -53,7 +53,16 @@ class Navigation {
                 <a href="index.html" class="nav-logo" aria-label="FlowState Home">
                     <img src="images/logo.svg" alt="FlowState" class="nav-logo__image">
                 </a>
-                <ul class="nav-links" role="list">
+
+                <!-- Mobile toggle -->
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
+                    <span class="visually-hidden">Toggle navigation</span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                </button>
+
+                <ul id="nav-links-list" class="nav-links" role="list">
                     ${navLinks.map(link => {
                         const isActive =
                             (link.id === 'index' && this.currentPage === 'index') ||
@@ -77,17 +86,164 @@ class Navigation {
 
     attachEvents() {
         const navLinks = this.navElement.querySelectorAll('.nav-link');
-        
+
         navLinks.forEach(link => {
             link.addEventListener('mouseenter', this.handleLinkHover);
             link.addEventListener('mouseleave', this.handleLinkLeave);
 
-    
             if (link.getAttribute('href').startsWith('#')) {
                 link.addEventListener('click', this.handleAnchorClick);
             }
 
+            // wil close   menu when a nav link is clicked 
+            link.addEventListener('click', () => {
+                const mobileList = this.navElement.querySelector('.nav-links');
+                if (mobileList && mobileList.classList.contains('open')) {
+                    this.closeMobileMenu();
+                }
+            });
         });
+
+        // Mobile toggle button
+        const toggle = this.navElement.querySelector('.nav-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleMobileMenu();
+            });
+        }
+
+        //menu will be closed 
+        window.addEventListener('resize', () => {
+            const mobileList = this.navElement.querySelector('.nav-links');
+            if (mobileList && mobileList.classList.contains('open')) {
+                this.closeMobileMenu();
+            }
+        });
+    }
+
+    toggleMobileMenu() {
+        const mobileList = this.navElement.querySelector('.nav-links');
+        if (!mobileList) return;
+
+        if (mobileList.classList.contains('open')) {
+            this.closeMobileMenu();
+        } else {
+            this.openMobileMenu();
+        }
+    }
+
+    openMobileMenu() {
+        const toggle = this.navElement.querySelector('.nav-toggle');
+        const mobileList = this.navElement.querySelector('.nav-links');
+        if (!mobileList) return;
+
+        // add overlay
+        let overlay = document.getElementById('nav-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'nav-overlay';
+            overlay.className = 'nav-overlay';
+            document.body.appendChild(overlay);
+        }
+        // allow transition
+        requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+        mobileList.classList.add('open');
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.classList.add('is-open');
+            // move focus to first link for accessibility
+            const firstLink = mobileList.querySelector('.nav-link');
+            if (firstLink) firstLink.focus();
+        }
+
+        // prevent background scroll
+        document.body.style.overflow = 'hidden';
+
+        // stagger children animation delays
+        const items = Array.from(mobileList.querySelectorAll('.nav-item'));
+        items.forEach((it, i) => {
+            const delay = i * 45; // ms
+            it.style.transitionDelay = `${delay}ms`;
+        });
+
+        // overlay click closes menu
+        overlay.addEventListener('click', this._overlayClickHandler = (e) => {
+            e.preventDefault();
+            this.closeMobileMenu();
+        });
+
+        // keydown handler for ESC and focus trap
+        this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
+        document.addEventListener('keydown', this._mobileKeydownHandler);
+    }
+
+    closeMobileMenu() {
+        const toggle = this.navElement.querySelector('.nav-toggle');
+        const mobileList = this.navElement.querySelector('.nav-links');
+        if (!mobileList) return;
+
+        mobileList.classList.remove('open');
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.classList.remove('is-open');
+            toggle.focus();
+        }
+
+        // remove overlay
+        const overlay = document.getElementById('nav-overlay');
+        if (overlay) {
+            overlay.classList.remove('is-visible');
+            // remove after transition
+            setTimeout(() => overlay.remove(), 300);
+            if (this._overlayClickHandler) overlay.removeEventListener('click', this._overlayClickHandler);
+            this._overlayClickHandler = null;
+        }
+
+        // re-enable background scroll
+        document.body.style.overflow = '';
+
+        // clear stagger inline styles
+        const items = mobileList.querySelectorAll('.nav-item');
+        items.forEach(it => { it.style.transitionDelay = ''; });
+
+        // remove keydown handler
+        if (this._mobileKeydownHandler) {
+            document.removeEventListener('keydown', this._mobileKeydownHandler);
+            this._mobileKeydownHandler = null;
+        }
+    }
+
+    _handleMobileKeydown(e) {
+        const mobileList = this.navElement.querySelector('.nav-links');
+        if (!mobileList || !mobileList.classList.contains('open')) return;
+
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            e.preventDefault();
+            this.closeMobileMenu();
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            // focus trap
+            const focusable = mobileList.querySelectorAll('a, button');
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
     }
 
     handleLinkHover(e) {
