@@ -32,6 +32,28 @@ class Navigation {
 
     render() {
         const isHomepage = this.currentPage === 'index';
+    // compute a relative prefix to reach site root from current path
+        // robustly handle file:// paths and nested folders
+        const rawSegments = window.location.pathname.split('/').filter(Boolean);
+        // remove filename if present (contains a dot, e.g., index.html)
+        let segments = rawSegments.slice();
+        const last = segments[segments.length - 1] || '';
+        if (last.indexOf('.') !== -1) {
+            segments = segments.slice(0, -1);
+        }
+
+    
+        if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
+            segments = segments.slice(1);
+        }
+
+        const upLevels = Math.max(0, segments.length);
+        const relPrefix = '../'.repeat(upLevels);
+
+    
+        if (window && window.location && window.console && window.console.debug) {
+            console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
+        }
         
         const navLinks = isHomepage 
             ? [
@@ -43,14 +65,14 @@ class Navigation {
             : [
                 { name: 'Home', href: 'index.html', id: 'index' },
                 { name: 'About', href: 'index.html#about', id: 'about' },
-                { name: 'All Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
+                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
                 { name: 'Contact', href: 'contact.html', id: 'contact' }
               ];
 
 
         const navHTML = `
             <div class="nav-container">
-                <a href="index.html" class="nav-logo" aria-label="FlowState Home">
+                <a href="${relPrefix}index.html" class="nav-logo" aria-label="FlowState Home">
                     <img src="images/logo.svg" alt="FlowState" class="nav-logo__image">
                 </a>
 
@@ -67,9 +89,11 @@ class Navigation {
                         const isActive =
                             (link.id === 'index' && this.currentPage === 'index') ||
                             (link.id === 'contact' && this.currentPage === 'contact');
+                        // use root-relative prefix for the href when not on homepage
+                        const href = isHomepage && link.href.startsWith('#') ? link.href : (relPrefix + link.href);
                         return `
                         <li class="nav-item">
-                            <a href="${link.href}"
+                            <a href="${href}"
                                class="nav-link${isActive ? ' active' : ''}"
                                data-link-id="${link.id}">
                                 <span class="nav-link__text">${link.name}</span>
