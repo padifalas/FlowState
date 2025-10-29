@@ -59,7 +59,7 @@ class Navigation {
             ? [
                 { name: 'Home', href: 'index.html', id: 'index' },
                 { name: 'About', href: '#about', id: 'about' },
-                { name: 'All Hubs', href: '#mood-hubs', id: 'hubs' },
+                { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
                 { name: 'Contact', href: 'contact.html', id: 'contact' }
               ]
             : [
@@ -73,7 +73,7 @@ class Navigation {
         const navHTML = `
             <div class="nav-container">
                 <a href="${relPrefix}index.html" class="nav-logo" aria-label="FlowState Home">
-                    <img src="images/logo.svg" alt="FlowState" class="nav-logo__image">
+                    <img src="${relPrefix}assets/logo.svg" alt="FlowState" class="nav-logo__image">
                 </a>
 
                 <!-- Mobile toggle -->
