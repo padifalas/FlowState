@@ -11,6 +11,19 @@ class HubController {
         this.deezerAPI = new DeezerAPI();
         this.musicRenderer = new MusicRenderer();
         
+        // Initialize TMDB API with configured API key (read from api/api-config.js when included)
+        // Falls back to the placeholder if API_CONFIG isn't available so the page won't crash immediately.
+        let tmdbKey = '5f8501a4f0d878bdde0a35fad39d8ca3';
+        try {
+            if (typeof API_CONFIG !== 'undefined' && API_CONFIG.tmdb && API_CONFIG.tmdb.apiKey) {
+                tmdbKey = API_CONFIG.tmdb.apiKey;
+            }
+        } catch (e) {
+            // ignore - we'll use the placeholder key
+        }
+        this.tmdbAPI = new TMDBAPI(tmdbKey);
+        this.movieRenderer = new MovieRenderer();
+        
         // Cache for loaded content
         this.contentCache = {
             music: null,
@@ -41,7 +54,7 @@ class HubController {
         if (path.includes('creative')) return 'creative';
         if (path.includes('melancholy')) return 'melancholy';
         
-        return 'focus'; // default
+        return 'focus'; // Default
     }
 
     // ============================================
@@ -51,14 +64,14 @@ class HubController {
     async init() {
         console.log(`Initializing ${this.currentHub} hub...`);
         
-        // setting up UI elements
+        // Setup UI elements
         this.setupContainers();
         this.setupFilterButtons();
         
-        // load initial content mayb
+        // Load initial content
         await this.loadContent();
         
-        // setuop event listeners
+        // Setup event listeners
         this.attachEvents();
         
         console.log('Hub initialized successfully');
@@ -78,6 +91,11 @@ class HubController {
         // Store references to other sections
         this.moviesContainer = document.querySelector('.content-grid--movies');
         this.gamesContainer = document.querySelector('.content-grid--games');
+
+        // Wire movie renderer container if present
+        if (this.moviesContainer) {
+            this.movieRenderer.setContainer(this.moviesContainer);
+        }
     }
 
     // ============================================
@@ -147,7 +165,7 @@ class HubController {
             await this.loadMusicContent();
             
             // Load other content (movies, games) - placeholder for now
-            // this.loadMoviesContent();
+           this.loadMoviesContent();
             // this.loadGamesContent();
             
         } catch (error) {
@@ -197,15 +215,36 @@ class HubController {
 
     async loadMoviesContent() {
         if (!this.moviesContainer) return;
-        
-        this.moviesContainer.innerHTML = `
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>Movie recommendations coming soon...</p>
-            </div>
-        `;
-        
-        // TODO: Implement TMDB API integration
+
+        // show loading UI
+        this.movieRenderer.renderLoadingState();
+
+        try {
+            // If we have cached movies for this hub, use them
+            if (this.contentCache.movies && this.contentCache.movies[this.currentHub]) {
+                const cached = this.contentCache.movies[this.currentHub];
+                this.movieRenderer.render(cached);
+                return;
+            }
+
+            // Fetch mood-based movies (limit 12)
+            const movies = await this.tmdbAPI.getMoodMovies(this.currentHub, 12);
+
+            if (!movies || movies.length === 0) {
+                this.movieRenderer.renderEmptyState();
+                return;
+            }
+
+            // Cache by hub
+            if (!this.contentCache.movies) this.contentCache.movies = {};
+            this.contentCache.movies[this.currentHub] = movies;
+
+            // Render
+            this.movieRenderer.render(movies);
+        } catch (error) {
+            console.error('Error loading movies:', error);
+            this.movieRenderer.renderErrorState('Failed to load movies. Please try again later.');
+        }
     }
 
     // ============================================

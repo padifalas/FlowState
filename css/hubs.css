@@ -549,9 +549,9 @@
     }
 }
 
-.content-grid--movies {
+/* .content-grid--movies {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-}
+} */
 
 .content-grid--games {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
