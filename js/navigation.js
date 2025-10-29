@@ -54,6 +54,16 @@ class Navigation {
         if (window && window.location && window.console && window.console.debug) {
             console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
         }
+
+        // If a <base> tag is present (useful for GitHub Pages project sites), prefer that for building hrefs.
+        // Example: <base href="/repo-name/"> will make links resolve to /repo-name/index.html etc.
+        const baseEl = document.querySelector && document.querySelector('base');
+        const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
+        const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
+
+        // compute logo href/src depending on presence of base
+        const logoHref = normalizedBase ? (normalizedBase + 'index.html') : (relPrefix + 'index.html');
+        const logoSrc = normalizedBase ? (normalizedBase + 'assets/logo.svg') : (relPrefix + 'assets/logo.svg');
         
         const navLinks = isHomepage 
             ? [
@@ -72,8 +82,8 @@ class Navigation {
 
         const navHTML = `
             <div class="nav-container">
-                <a href="${relPrefix}index.html" class="nav-logo" aria-label="FlowState Home">
-                    <img src="${relPrefix}assets/logo.svg" alt="FlowState" class="nav-logo__image">
+                <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
+                    <img src="${logoSrc}" alt="FlowState" class="nav-logo__image">
                 </a>
 
                 <!-- Mobile toggle -->
@@ -89,8 +99,10 @@ class Navigation {
                         const isActive =
                             (link.id === 'index' && this.currentPage === 'index') ||
                             (link.id === 'contact' && this.currentPage === 'contact');
-                        // use root-relative prefix for the href when not on homepage
-                        const href = isHomepage && link.href.startsWith('#') ? link.href : (relPrefix + link.href);
+                        // If a base href is declared, build links from it; otherwise use relPrefix.
+                        const href = normalizedBase
+                            ? (normalizedBase + link.href)
+                            : (isHomepage && link.href.startsWith('#') ? link.href : (relPrefix + link.href));
                         return `
                         <li class="nav-item">
                             <a href="${href}"
