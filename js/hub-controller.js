@@ -11,8 +11,7 @@ class HubController {
         this.deezerAPI = new DeezerAPI();
         this.musicRenderer = new MusicRenderer();
         
-        // Initialize TMDB API with configured API key (read from api/api-config.js when included)
-        // Falls back to the placeholder if API_CONFIG isn't available so the page won't crash immediately.
+        // Initialize TMDB API
         let tmdbKey = '5f8501a4f0d878bdde0a35fad39d8ca3';
         try {
             if (typeof API_CONFIG !== 'undefined' && API_CONFIG.tmdb && API_CONFIG.tmdb.apiKey) {
@@ -23,6 +22,18 @@ class HubController {
         }
         this.tmdbAPI = new TMDBAPI(tmdbKey);
         this.movieRenderer = new MovieRenderer();
+        
+        // Initialize RAWG API for games
+        let rawgKey = 'YOUR_RAWG_API_KEY_HERE';
+        try {
+            if (typeof API_CONFIG !== 'undefined' && API_CONFIG.rawg && API_CONFIG.rawg.apiKey) {
+                rawgKey = API_CONFIG.rawg.apiKey;
+            }
+        } catch (e) {
+            console.warn('RAWG API key not found');
+        }
+        this.rawgAPI = new RAWGAPI(rawgKey);
+        this.gameRenderer = new GameRenderer();
         
         // Cache for loaded content
         this.contentCache = {
@@ -88,13 +99,16 @@ class HubController {
             this.musicRenderer.setContainer(musicGrid);
         }
         
-        // Store references to other sections
+        // Movies section
         this.moviesContainer = document.querySelector('.content-grid--movies');
-        this.gamesContainer = document.querySelector('.content-grid--games');
-
-        // Wire movie renderer container if present
         if (this.moviesContainer) {
             this.movieRenderer.setContainer(this.moviesContainer);
+        }
+
+        // Games section
+        this.gamesContainer = document.querySelector('.content-grid--games');
+        if (this.gamesContainer) {
+            this.gameRenderer.setContainer(this.gamesContainer);
         }
     }
 
@@ -161,12 +175,12 @@ class HubController {
 
     async loadContent() {
         try {
-            // Load music content
-            await this.loadMusicContent();
-            
-            // Load other content (movies, games) - placeholder for now
-           this.loadMoviesContent();
-            // this.loadGamesContent();
+            // Load all content in parallel
+            await Promise.all([
+                this.loadMusicContent(),
+                this.loadMoviesContent(),
+                this.loadGamesContent()
+            ]);
             
         } catch (error) {
             console.error('Error loading content:', error);
@@ -210,13 +224,13 @@ class HubController {
     }
 
     // ============================================
-    // LOAD MOVIES CONTENT (Placeholder)
+    // LOAD MOVIES CONTENT
     // ============================================
 
     async loadMoviesContent() {
         if (!this.moviesContainer) return;
 
-        // show loading UI
+        // Show loading UI
         this.movieRenderer.renderLoadingState();
 
         try {
@@ -241,6 +255,8 @@ class HubController {
 
             // Render
             this.movieRenderer.render(movies);
+            
+            console.log(`Loaded ${movies.length} movies for ${this.currentHub}`);
         } catch (error) {
             console.error('Error loading movies:', error);
             this.movieRenderer.renderErrorState('Failed to load movies. Please try again later.');
@@ -248,20 +264,47 @@ class HubController {
     }
 
     // ============================================
-    // LOAD GAMES CONTENT (Placeholder)
+    // LOAD GAMES CONTENT
     // ============================================
 
     async loadGamesContent() {
         if (!this.gamesContainer) return;
         
-        this.gamesContainer.innerHTML = `
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>Game recommendations coming soon...</p>
-            </div>
-        `;
+        console.log(`Loading games for ${this.currentHub} hub...`);
         
-        // TODO: Implement Itch.io API integration
+        // Show loading state
+        this.gameRenderer.renderLoadingState();
+        
+        try {
+            // Check cache first
+            if (this.contentCache.games && this.contentCache.games[this.currentHub]) {
+                const cached = this.contentCache.games[this.currentHub];
+                this.gameRenderer.render(cached);
+                console.log(`Loaded ${cached.length} games from cache`);
+                return;
+            }
+
+            // Fetch mood-based games
+            const games = await this.rawgAPI.getMoodGames(this.currentHub, 12);
+
+            if (!games || games.length === 0) {
+                this.gameRenderer.renderEmptyState();
+                return;
+            }
+
+            // Cache by hub
+            if (!this.contentCache.games) this.contentCache.games = {};
+            this.contentCache.games[this.currentHub] = games;
+
+            // Render in carousel
+            this.gameRenderer.render(games);
+            
+            console.log(`Loaded ${games.length} games for ${this.currentHub}`);
+            
+        } catch (error) {
+            console.error('Error loading games:', error);
+            this.gameRenderer.renderErrorState('Failed to load games. Please try again later.');
+        }
     }
 
     // ============================================
@@ -315,7 +358,7 @@ class HubController {
         const refreshButton = document.querySelector('[data-action="refresh"]');
         if (refreshButton) {
             refreshButton.addEventListener('click', () => {
-                this.deezerAPI.clearCache();
+                this.clearAllCaches();
                 this.loadContent();
             });
         }
@@ -339,13 +382,23 @@ class HubController {
         return shuffled;
     }
 
+    clearAllCaches() {
+        this.deezerAPI.clearCache();
+        this.rawgAPI.clearCache();
+        this.contentCache = {
+            music: null,
+            movies: null,
+            games: null
+        };
+    }
+
     // ============================================
     // PUBLIC API
     // ============================================
 
     // Refresh all content
     async refresh() {
-        this.deezerAPI.clearCache();
+        this.clearAllCaches();
         await this.loadContent();
     }
 

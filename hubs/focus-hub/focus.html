@@ -10,38 +10,43 @@
     
     <title>Focus Hub - FlowState</title>
     
-   
-    <link rel="preconnect" href="https://api.spotify.com">
+    <!-- Preconnect to APIs -->
+    <link rel="preconnect" href="https://api.deezer.com">
     <link rel="preconnect" href="https://api.themoviedb.org">
-    <link rel="preconnect" href="https://itch.io">
+    <link rel="preconnect" href="https://api.rawg.io">
     
-    <!-- stylesheets -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="../../css/styles.css">
     <link rel="stylesheet" href="../../css/hubs.css">
     <link rel="stylesheet" href="../../css/movie-modal.css">
     <link rel="stylesheet" href="../../css/music-cards.css">
+    <link rel="stylesheet" href="../../css/game-carousel.css">
     
-    <!-- GSAP  -->
+    <!-- GSAP Animation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     
-    <!-- scripts -->
-    <script src="../../js/navigation.js" defer></script>
+    <!-- API Configuration & Scripts -->
     <script src="../../api/api-secrets.js"></script>
     <script src="../../api/api-config.js"></script>
-    <script src="../../api/tmdb-api.js"></script>
     <script src="../../api/deezer-api.js"></script>
-
+    <script src="../../api/tmdb-api.js"></script>
+    <script src="../../api/rawg-api.js"></script>
+    
+    <!-- Renderers -->
     <script src="../../js/music-renderer.js"></script>
     <script src="../../js/movie-renderer.js"></script>
+    <script src="../../js/game-renderer.js"></script>
+    
+    <!-- Controllers -->
+    <script src="../../js/navigation.js" defer></script>
     <script src="../../js/hub-controller.js"></script>
-
 </head>
 <body class="hub-page" data-hub="focus">
   
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- side Navigation Panel -->
+    <!-- Side Navigation Panel -->
     <aside class="side-nav" id="side-navigation" aria-label="Hub navigation">
         <button class="side-nav__toggle" aria-expanded="false" aria-controls="side-nav-menu" aria-label="Toggle hub navigation">
             <span class="side-nav__hamburger"></span>
@@ -86,10 +91,10 @@
 
     <!-- Main Navigation -->
     <nav id="main-navigation" aria-label="Main navigation">
-      
+        <!-- Navigation will be injected by navigation.js -->
     </nav>
 
-    <!-- pomodoro Timer Widget -->
+    <!-- Pomodoro Timer Widget -->
     <aside class="timer-widget" aria-label="Pomodoro timer">
         <div class="timer-widget__container">
             <svg class="timer-widget__progress" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
@@ -166,20 +171,19 @@
         </nav>
 
         <!-- Music Content Section -->
-<section id="music-section" class="content-section" aria-labelledby="music-heading" data-category="music">
-    <header class="content-section__header">
-        <h2 id="music-heading" class="content-section__title">Focus Music</h2>
-        <p class="content-section__subtitle">Instrumental and ambient tracks to enhance concentration</p>
-    </header>
-    
-    <div class="content-grid content-grid--music" role="list">
-        <!-- Music cards will be injected here by JavaScript -->
-        <div class="loading-state" aria-live="polite" aria-busy="true">
-            <div class="loading-spinner" aria-hidden="true"></div>
-            <p>Loading music recommendations...</p>
-        </div>
-    </div>
-</section>
+        <section id="music-section" class="content-section" aria-labelledby="music-heading" data-category="music">
+            <header class="content-section__header">
+                <h2 id="music-heading" class="content-section__title">Focus Music</h2>
+                <p class="content-section__subtitle">Instrumental and ambient tracks to enhance concentration</p>
+            </header>
+            
+            <div class="content-grid content-grid--music" role="list">
+                <div class="loading-state" aria-live="polite" aria-busy="true">
+                    <div class="loading-spinner" aria-hidden="true"></div>
+                    <p>Loading music recommendations...</p>
+                </div>
+            </div>
+        </section>
 
         <!-- Movies Content Section -->
         <section id="movies-section" class="content-section" aria-labelledby="movies-heading" data-category="movies">
@@ -189,7 +193,6 @@
             </header>
             
             <div class="content-grid content-grid--movies" role="list">
-                <!-- Movies by js -->
                 <div class="loading-state" aria-live="polite" aria-busy="true">
                     <div class="loading-spinner" aria-hidden="true"></div>
                     <p>Loading movie recommendations...</p>
@@ -201,11 +204,10 @@
         <section id="games-section" class="content-section" aria-labelledby="games-heading" data-category="games">
             <header class="content-section__header">
                 <h2 id="games-heading" class="content-section__title">Focus Games</h2>
-                <p class="content-section__subtitle">Logic puzzles and memory games for mental breaks</p>
+                <p class="content-section__subtitle">Logic puzzles and strategy games for mental breaks</p>
             </header>
             
             <div class="content-grid content-grid--games" role="list">
-                <!-- games cards will be  by js -->
                 <div class="loading-state" aria-live="polite" aria-busy="true">
                     <div class="loading-spinner" aria-hidden="true"></div>
                     <p>Loading game recommendations...</p>
@@ -229,5 +231,10 @@
             </nav>
         </div>
     </footer>
+    
+    <!-- Update copyright year -->
+    <script>
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

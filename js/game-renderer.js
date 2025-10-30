@@ -1,10 +1,14 @@
 // ============================================
-// GAME UI RENDERER (Nintendo Switch Style)
+// GAME UI RENDERER (Carousel Style)
 // ============================================
 
 class GameRenderer {
     constructor() {
         this.container = null;
+        this.currentIndex = 0;
+        this.games = [];
+        this.cardsPerView = 4; // Default cards visible at once
+        this.autoPlayInterval = null;
     }
 
     // ============================================
@@ -13,10 +17,33 @@ class GameRenderer {
 
     setContainer(containerElement) {
         this.container = containerElement;
+        this.updateCardsPerView();
+        
+        // Update cards per view on resize
+        window.addEventListener('resize', () => {
+            this.updateCardsPerView();
+        });
     }
 
     // ============================================
-    // RENDER GAMES
+    // UPDATE CARDS PER VIEW (Responsive)
+    // ============================================
+
+    updateCardsPerView() {
+        const width = window.innerWidth;
+        if (width < 640) {
+            this.cardsPerView = 1;
+        } else if (width < 1024) {
+            this.cardsPerView = 2;
+        } else if (width < 1440) {
+            this.cardsPerView = 3;
+        } else {
+            this.cardsPerView = 4;
+        }
+    }
+
+    // ============================================
+    // RENDER GAMES (Carousel)
     // ============================================
 
     render(games) {
@@ -25,154 +52,214 @@ class GameRenderer {
             return;
         }
 
-        // Clear existing content
-        this.container.innerHTML = '';
+        this.games = games;
+        this.currentIndex = 0;
 
-        // If no games, show empty state
         if (!games || games.length === 0) {
             this.renderEmptyState();
             return;
         }
 
-        // Create and append cards
+        // Create carousel structure
+        this.container.innerHTML = `
+            <div class="game-carousel">
+                <button class="game-carousel__nav game-carousel__nav--prev" aria-label="Previous games">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="game-carousel__viewport">
+                    <div class="game-carousel__track">
+                        <!-- Game cards will be inserted here -->
+                    </div>
+                </div>
+                
+                <button class="game-carousel__nav game-carousel__nav--next" aria-label="Next games">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="game-carousel__indicators" role="tablist" aria-label="Game carousel pages">
+                <!-- Indicators will be inserted here -->
+            </div>
+        `;
+
+        // Get references
+        const track = this.container.querySelector('.game-carousel__track');
+        const prevBtn = this.container.querySelector('.game-carousel__nav--prev');
+        const nextBtn = this.container.querySelector('.game-carousel__nav--next');
+        const indicatorsContainer = this.container.querySelector('.game-carousel__indicators');
+
+        // Create game cards
         games.forEach((game, index) => {
             const card = this.createGameCard(game, index);
-            this.container.appendChild(card);
+            track.appendChild(card);
         });
 
-        // Trigger stagger animation if GSAP is available
-        if (typeof gsap !== 'undefined') {
-            this.animateCards();
+        // Create indicators
+        const pageCount = Math.ceil(games.length / this.cardsPerView);
+        for (let i = 0; i < pageCount; i++) {
+            const indicator = document.createElement('button');
+            indicator.className = `game-carousel__indicator ${i === 0 ? 'game-carousel__indicator--active' : ''}`;
+            indicator.setAttribute('aria-label', `Go to page ${i + 1}`);
+            indicator.setAttribute('role', 'tab');
+            indicator.addEventListener('click', () => this.goToPage(i));
+            indicatorsContainer.appendChild(indicator);
         }
+
+        // Attach navigation events
+        prevBtn.addEventListener('click', () => this.navigate('prev'));
+        nextBtn.addEventListener('click', () => this.navigate('next'));
+
+        // Initial position
+        this.updateCarouselPosition();
+
+        // Animate cards in
+        if (typeof gsap !== 'undefined') {
+            this.animateCardsIn();
+        }
+
+        // Auto-play (optional - can be disabled)
+        // this.startAutoPlay();
     }
 
     // ============================================
-    // CREATE GAME CARD (Nintendo Switch Style)
+    // CREATE GAME CARD
     // ============================================
 
     createGameCard(game, index) {
         const card = document.createElement('article');
         card.className = 'game-card';
-        card.setAttribute('data-type', 'game');
-        card.setAttribute('data-id', game.id);
+        card.setAttribute('data-game-id', game.id);
         card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+        card.style.transform = 'translateY(30px)';
 
-        // Create card HTML with Nintendo Switch styling
+        // Format rating
+        const ratingStars = this.generateStarRating(game.rating);
+        
+        // Format tags
+        const topTags = (game.tags || []).slice(0, 3);
+
         card.innerHTML = `
-            <div class="game-card__inner">
-                <div class="game-card__image-wrapper">
-                    <img 
-                        src="${this.getImageUrl(game)}" 
-                        alt="${this.escapeHtml(game.title)}"
-                        class="game-card__image"
-                        loading="lazy"
-                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22%3E%3Crect fill=%22%23282D35%22 width=%22300%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23898A85%22 font-family=%22sans-serif%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'"
-                    >
-                    <div class="game-card__overlay">
-                        <button class="game-card__play-btn" data-game-id="${game.id}" aria-label="Play ${this.escapeHtml(game.title)}">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M8 5v14l11-7z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    ${this.renderBadges(game)}
-                </div>
+            <div class="game-card__image-container">
+                <img 
+                    src="${game.image || this.getPlaceholderImage(game.mood)}" 
+                    alt="${this.escapeHtml(game.title)}"
+                    class="game-card__image"
+                    loading="lazy"
+                    onerror="this.src='${this.getPlaceholderImage(game.mood)}'"
+                >
                 
-                <div class="game-card__content">
+                ${game.metacritic ? `
+                    <div class="game-card__metacritic" aria-label="Metacritic score: ${game.metacritic}">
+                        <span class="game-card__metacritic-score">${game.metacritic}</span>
+                    </div>
+                ` : ''}
+                
+                <div class="game-card__overlay">
+                    <button class="game-card__play-btn" aria-label="Play ${this.escapeHtml(game.title)}">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span>Play Now</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="game-card__content">
+                <div class="game-card__header">
                     <h3 class="game-card__title">${this.escapeHtml(game.title)}</h3>
                     
-                    <div class="game-card__meta">
+                    <div class="game-card__rating" aria-label="Rating: ${game.rating} out of 5">
+                        ${ratingStars}
+                        <span class="game-card__rating-value">${game.rating.toFixed(1)}</span>
+                    </div>
+                </div>
+                
+                <div class="game-card__tags">
+                    ${topTags.map(tag => `
+                        <span class="game-card__tag">${this.escapeHtml(tag)}</span>
+                    `).join('')}
+                </div>
+                
+                <p class="game-card__description">${this.escapeHtml(game.shortDescription)}</p>
+                
+                <div class="game-card__meta">
+                    ${game.released ? `
                         <span class="game-card__meta-item">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
                             </svg>
-                            ${game.rating}
+                            ${new Date(game.released).getFullYear()}
                         </span>
+                    ` : ''}
+                    
+                    ${game.playtime ? `
                         <span class="game-card__meta-item">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
-                            ${game.duration}
+                            ${game.playtime}h avg
                         </span>
-                        <span class="game-card__difficulty game-card__difficulty--${game.difficulty}">
-                            ${this.getDifficultyIcon(game.difficulty)}
-                            ${game.difficulty}
+                    ` : ''}
+                    
+                    ${game.esrbRating && game.esrbRating !== 'Not Rated' ? `
+                        <span class="game-card__meta-item game-card__meta-item--esrb">
+                            ${game.esrbRating}
                         </span>
-                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="game-card__actions">
+                    <a 
+                        href="${game.link}" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="game-card__btn game-card__btn--primary"
+                        aria-label="Play ${this.escapeHtml(game.title)}"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Play Game
+                    </a>
                     
-                    <div class="game-card__tags">
-                        ${this.renderTags(game.tags)}
-                    </div>
+                    <button 
+                        class="game-card__btn game-card__btn--secondary"
+                        aria-label="More info about ${this.escapeHtml(game.title)}"
+                        data-action="info"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </button>
                     
-                    <div class="game-card__actions">
-                        <button class="game-card__btn game-card__btn--primary" data-action="play" data-game-id="${game.id}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <circle cx="12" cy="12" r="1"></circle>
-                                <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="12">A</text>
-                            </svg>
-                            START
-                        </button>
-                        <button class="game-card__btn game-card__btn--secondary" data-action="favorite" data-game-id="${game.id}">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
+                    <button 
+                        class="game-card__btn game-card__btn--secondary"
+                        aria-label="Add to favorites"
+                        data-action="favorite"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         `;
 
-        // Add event listeners
+        // Attach events
         this.attachCardEvents(card, game);
 
         return card;
-    }
-
-    // ============================================
-    // RENDER BADGES
-    // ============================================
-
-    renderBadges(game) {
-        const badges = [];
-        
-        // Popular badge
-        if (game.plays > 10000) {
-            badges.push('<span class="game-card__badge game-card__badge--popular">Popular</span>');
-        }
-        
-        // New badge (if game has a recent date - placeholder logic)
-        if (game.isNew) {
-            badges.push('<span class="game-card__badge game-card__badge--new">New</span>');
-        }
-        
-        return badges.join('');
-    }
-
-    // ============================================
-    // RENDER TAGS
-    // ============================================
-
-    renderTags(tags) {
-        if (!tags || tags.length === 0) return '';
-        
-        return tags.slice(0, 3).map(tag => 
-            `<span class="game-card__tag">${this.escapeHtml(tag)}</span>`
-        ).join('');
-    }
-
-    // ============================================
-    // GET DIFFICULTY ICON
-    // ============================================
-
-    getDifficultyIcon(difficulty) {
-        const icons = {
-            easy: '●',
-            medium: '●●',
-            hard: '●●●'
-        };
-        return icons[difficulty] || '●';
     }
 
     // ============================================
@@ -180,76 +267,249 @@ class GameRenderer {
     // ============================================
 
     attachCardEvents(card, game) {
-        // Play buttons
-        const playButtons = card.querySelectorAll('[data-action="play"], .game-card__play-btn');
-        playButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handlePlay(game);
-            });
-        });
+        // Info button
+        const infoBtn = card.querySelector('[data-action="info"]');
+        if (infoBtn) {
+            infoBtn.addEventListener('click', () => this.showGameInfo(game));
+        }
 
         // Favorite button
-        const favoriteBtn = card.querySelector('[data-action="favorite"]');
-        if (favoriteBtn) {
-            favoriteBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleFavorite(game, favoriteBtn);
+        const favBtn = card.querySelector('[data-action="favorite"]');
+        if (favBtn) {
+            favBtn.addEventListener('click', () => this.toggleFavorite(game, favBtn));
+        }
+
+        // Play overlay
+        const playOverlay = card.querySelector('.game-card__play-btn');
+        if (playOverlay) {
+            playOverlay.addEventListener('click', () => {
+                window.open(game.link, '_blank', 'noopener,noreferrer');
             });
         }
 
-        // Card hover effect
+        // Hover effects
         card.addEventListener('mouseenter', () => {
             if (typeof gsap !== 'undefined') {
-                gsap.to(card, {
-                    y: -8,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
+                gsap.to(card, { y: -8, duration: 0.3, ease: 'power2.out' });
             }
         });
 
         card.addEventListener('mouseleave', () => {
             if (typeof gsap !== 'undefined') {
-                gsap.to(card, {
-                    y: 0,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
+                gsap.to(card, { y: 0, duration: 0.3, ease: 'power2.out' });
             }
         });
     }
 
     // ============================================
-    // HANDLE PLAY
+    // CAROUSEL NAVIGATION
     // ============================================
 
-    handlePlay(game) {
-        // Open game in new window/tab
-        if (game.url && game.url !== '#') {
-            window.open(game.url, '_blank', 'noopener,noreferrer');
+    navigate(direction) {
+        const maxIndex = Math.max(0, this.games.length - this.cardsPerView);
+        
+        if (direction === 'next') {
+            this.currentIndex = Math.min(this.currentIndex + this.cardsPerView, maxIndex);
         } else {
-            this.showToast('Game coming soon! This is a demo.');
+            this.currentIndex = Math.max(this.currentIndex - this.cardsPerView, 0);
+        }
+
+        this.updateCarouselPosition();
+        this.updateIndicators();
+    }
+
+    goToPage(pageIndex) {
+        this.currentIndex = pageIndex * this.cardsPerView;
+        this.updateCarouselPosition();
+        this.updateIndicators();
+    }
+
+    updateCarouselPosition() {
+        const track = this.container.querySelector('.game-carousel__track');
+        if (!track) return;
+
+        const cardWidth = track.querySelector('.game-card')?.offsetWidth || 0;
+        const gap = 24; // CSS gap value
+        const offset = -(this.currentIndex * (cardWidth + gap));
+
+        if (typeof gsap !== 'undefined') {
+            gsap.to(track, {
+                x: offset,
+                duration: 0.5,
+                ease: 'power2.out'
+            });
+        } else {
+            track.style.transform = `translateX(${offset}px)`;
+        }
+    }
+
+    updateIndicators() {
+        const indicators = this.container.querySelectorAll('.game-carousel__indicator');
+        const currentPage = Math.floor(this.currentIndex / this.cardsPerView);
+
+        indicators.forEach((indicator, index) => {
+            if (index === currentPage) {
+                indicator.classList.add('game-carousel__indicator--active');
+                indicator.setAttribute('aria-selected', 'true');
+            } else {
+                indicator.classList.remove('game-carousel__indicator--active');
+                indicator.setAttribute('aria-selected', 'false');
+            }
+        });
+    }
+
+    // ============================================
+    // AUTO-PLAY
+    // ============================================
+
+    startAutoPlay(interval = 5000) {
+        this.stopAutoPlay();
+        this.autoPlayInterval = setInterval(() => {
+            this.navigate('next');
+            
+            // Loop back to start if at end
+            if (this.currentIndex >= this.games.length - this.cardsPerView) {
+                setTimeout(() => {
+                    this.currentIndex = 0;
+                    this.updateCarouselPosition();
+                    this.updateIndicators();
+                }, interval);
+            }
+        }, interval);
+    }
+
+    stopAutoPlay() {
+        if (this.autoPlayInterval) {
+            clearInterval(this.autoPlayInterval);
+            this.autoPlayInterval = null;
         }
     }
 
     // ============================================
-    // HANDLE FAVORITE
+    // SHOW GAME INFO (Modal or Expanded View)
     // ============================================
 
-    handleFavorite(game, button) {
-        const isFavorited = button.classList.toggle('favorited');
+    showGameInfo(game) {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.className = 'game-modal';
+        modal.innerHTML = `
+            <div class="game-modal__backdrop"></div>
+            <div class="game-modal__content">
+                <button class="game-modal__close" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <div class="game-modal__header">
+                    <img src="${game.image}" alt="${this.escapeHtml(game.title)}" class="game-modal__image">
+                    <div class="game-modal__header-content">
+                        <h2 class="game-modal__title">${this.escapeHtml(game.title)}</h2>
+                        <div class="game-modal__rating">
+                            ${this.generateStarRating(game.rating)}
+                            <span>${game.rating.toFixed(1)} / 5.0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-modal__body">
+                    <p class="game-modal__description">${this.escapeHtml(game.shortDescription)}</p>
+                    
+                    <div class="game-modal__details">
+                        ${game.genres && game.genres.length > 0 ? `
+                            <div class="game-modal__detail">
+                                <strong>Genres:</strong>
+                                <span>${game.genres.join(', ')}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${game.released ? `
+                            <div class="game-modal__detail">
+                                <strong>Released:</strong>
+                                <span>${new Date(game.released).toLocaleDateString()}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${game.playtime ? `
+                            <div class="game-modal__detail">
+                                <strong>Average Playtime:</strong>
+                                <span>${game.playtime} hours</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="game-modal__tags">
+                        ${(game.tags || []).map(tag => `
+                            <span class="game-card__tag">${this.escapeHtml(tag)}</span>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="game-modal__footer">
+                    <a 
+                        href="${game.link}" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="game-card__btn game-card__btn--primary"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Play Game
+                    </a>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Close handlers
+        const closeBtn = modal.querySelector('.game-modal__close');
+        const backdrop = modal.querySelector('.game-modal__backdrop');
         
+        const closeModal = () => {
+            if (typeof gsap !== 'undefined') {
+                gsap.to(modal, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => modal.remove()
+                });
+            } else {
+                modal.remove();
+            }
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
+
+        // Animate in
+        if (typeof gsap !== 'undefined') {
+            gsap.from(modal, { opacity: 0, duration: 0.3 });
+            gsap.from(modal.querySelector('.game-modal__content'), {
+                scale: 0.9,
+                duration: 0.3,
+                ease: 'back.out'
+            });
+        }
+    }
+
+    // ============================================
+    // TOGGLE FAVORITE
+    // ============================================
+
+    toggleFavorite(game, button) {
+        const isFavorited = button.classList.toggle('favorited');
         const svg = button.querySelector('svg');
+        
         if (isFavorited) {
             svg.setAttribute('fill', 'currentColor');
             button.style.color = 'var(--color-accent-red)';
-            this.saveFavorite(game);
             this.showToast('Added to favorites!');
         } else {
             svg.setAttribute('fill', 'none');
             button.style.color = '';
-            this.removeFavorite(game.id);
             this.showToast('Removed from favorites');
         }
 
@@ -262,66 +522,35 @@ class GameRenderer {
     }
 
     // ============================================
-    // LOCAL STORAGE
-    // ============================================
-
-    saveFavorite(game) {
-        const favorites = this.getFavorites();
-        favorites.push(game);
-        localStorage.setItem('flowstate_game_favorites', JSON.stringify(favorites));
-    }
-
-    removeFavorite(gameId) {
-        let favorites = this.getFavorites();
-        favorites = favorites.filter(fav => fav.id !== gameId);
-        localStorage.setItem('flowstate_game_favorites', JSON.stringify(favorites));
-    }
-
-    getFavorites() {
-        try {
-            const stored = localStorage.getItem('flowstate_game_favorites');
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Error reading favorites:', error);
-            return [];
-        }
-    }
-
-    // ============================================
     // RENDER STATES
     // ============================================
 
     renderLoadingState() {
         if (!this.container) return;
-
         this.container.innerHTML = `
             <div class="loading-state">
-                <div class="loading-spinner" aria-hidden="true"></div>
-                <p>Loading games...</p>
+                <div class="loading-spinner"></div>
+                <p>Loading game recommendations...</p>
             </div>
         `;
     }
 
     renderEmptyState() {
         if (!this.container) return;
-
         this.container.innerHTML = `
             <div class="empty-state">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="7" width="20" height="8" rx="1"></rect>
-                    <path d="M16 3h2v4h-2zM6 3h2v4H6z"></path>
-                    <circle cx="7.5" cy="11.5" r="1.5"></circle>
-                    <path d="M13 9.5h4M15 7.5v4"></path>
+                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                    <polyline points="17 2 12 7 7 2"></polyline>
                 </svg>
                 <h3>No games found</h3>
-                <p>Try adjusting your mood or check back later.</p>
+                <p>Check back later for game recommendations.</p>
             </div>
         `;
     }
 
     renderErrorState(message) {
         if (!this.container) return;
-
         this.container.innerHTML = `
             <div class="error-state">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -329,20 +558,19 @@ class GameRenderer {
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <h3>Oops! Something went wrong</h3>
+                <h3>Unable to load games</h3>
                 <p>${this.escapeHtml(message)}</p>
-                <button class="content-card__btn" onclick="location.reload()">Try Again</button>
+                <button class="game-card__btn" onclick="location.reload()">Try Again</button>
             </div>
         `;
     }
 
     // ============================================
-    // ANIMATE CARDS
+    // ANIMATE CARDS IN
     // ============================================
 
-    animateCards() {
+    animateCardsIn() {
         const cards = this.container.querySelectorAll('.game-card');
-        
         gsap.to(cards, {
             opacity: 1,
             y: 0,
@@ -356,8 +584,33 @@ class GameRenderer {
     // UTILITY METHODS
     // ============================================
 
-    getImageUrl(game) {
-        return game.cover || game.thumbnail || '';
+    generateStarRating(rating) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let stars = '';
+
+        for (let i = 0; i < 5; i++) {
+            if (i < fullStars) {
+                stars += '<span class="game-card__star game-card__star--full">★</span>';
+            } else if (i === fullStars && hasHalfStar) {
+                stars += '<span class="game-card__star game-card__star--half">★</span>';
+            } else {
+                stars += '<span class="game-card__star game-card__star--empty">★</span>';
+            }
+        }
+
+        return stars;
+    }
+
+    getPlaceholderImage(mood) {
+        const placeholders = {
+            focus: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23D93535%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2224%22%3EFocus Game%3C/text%3E%3C/svg%3E',
+            relax: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23B9C9A8%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2224%22%3ERelax Game%3C/text%3E%3C/svg%3E',
+            energize: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23E8A419%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2224%22%3EEnergize Game%3C/text%3E%3C/svg%3E',
+            creative: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%239C73CC%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2224%22%3ECreative Game%3C/text%3E%3C/svg%3E',
+            melancholy: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%236B8AA6%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2224%22%3EMelancholy Game%3C/text%3E%3C/svg%3E'
+        };
+        return placeholders[mood] || placeholders.focus;
     }
 
     escapeHtml(text) {
@@ -368,9 +621,7 @@ class GameRenderer {
 
     showToast(message, duration = 3000) {
         const existingToast = document.querySelector('.toast-notification');
-        if (existingToast) {
-            existingToast.remove();
-        }
+        if (existingToast) existingToast.remove();
 
         const toast = document.createElement('div');
         toast.className = 'toast-notification';
