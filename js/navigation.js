@@ -23,6 +23,103 @@ class Navigation {
         return page.replace('.html', '') || 'index';
     }
 
+    /**
+     * Detect which level we're at based on folder structure
+     * Returns: 'root', 'hubs', or 'nested-hubs'
+     */
+    detectPageLevel() {
+        const path = window.location.pathname;
+        
+        console.log('[Navigation] Full pathname:', path);
+        
+        // Clean the path
+        let cleanPath = path.replace(/^\//, '').replace(/^[A-Za-z]:\//, '');
+        const segments = cleanPath.split(/[/\\]/).filter(Boolean);
+        
+        // Remove filename
+        if (segments.length > 0 && segments[segments.length - 1].includes('.')) {
+            segments.pop();
+        }
+        
+        const depth = segments.length;
+        
+        // Check if we're in a hub page
+        if (path.includes('/hubs/') || path.includes('\\hubs\\')) {
+            if (depth >= 2) {
+                console.log('[Navigation] Detected: nested hub folder (depth:', depth + ')');
+                return 'nested-hubs';
+            }
+            console.log('[Navigation] Detected: hub folder (depth:', depth + ')');
+            return 'hubs';
+        }
+        
+        // Also check if the current file is a known hub page
+        const filename = path.split(/[/\\]/).pop() || '';
+        const hubFiles = ['focus.html', 'relax.html', 'energize.html', 'creative.html', 'melancholy.html',
+                          'focus-hub.html', 'relax-hub.html', 'energize-hub.html', 'creative-hub.html', 'melancholy-hub.html'];
+        
+        if (hubFiles.includes(filename)) {
+            console.log('[Navigation] Detected: hub file by filename:', filename, '(depth:', depth + ')');
+            return depth >= 2 ? 'nested-hubs' : 'hubs';
+        }
+        
+        console.log('[Navigation] Detected: at root level');
+        return 'root';
+    }
+
+    /**
+     * Get the correct relative prefix based on page level
+     * Counts actual directory depth from the project root
+     */
+    getRelativePrefix() {
+        const path = window.location.pathname;
+        
+        // For file:// protocol, we need to find where "FlowState" is
+        let projectRootIndex = -1;
+        const projectName = 'FlowState';
+        
+        // Find the project root in the path
+        const pathLower = path.toLowerCase();
+        projectRootIndex = pathLower.indexOf(projectName.toLowerCase());
+        
+        let relevantPath = path;
+        if (projectRootIndex !== -1) {
+            // Extract only the path after the project root
+            relevantPath = path.substring(projectRootIndex + projectName.length);
+        }
+        
+        console.log('[Navigation] Relevant path:', relevantPath);
+        
+        // Split by both forward and backward slashes
+        const segments = relevantPath.split(/[/\\]/).filter(seg => seg && seg !== '');
+        
+        // Remove the filename (last segment)
+        if (segments.length > 0 && segments[segments.length - 1].includes('.')) {
+            segments.pop();
+        }
+        
+        // Count how many directories deep we are from project root
+        const depth = segments.length;
+        
+        console.log('[Navigation] Path segments:', segments);
+        console.log('[Navigation] Directory depth:', depth);
+        
+        // Generate the correct number of ../
+        const prefix = depth > 0 ? '../'.repeat(depth) : '';
+        
+        console.log('[Navigation] Calculated prefix:', prefix || '(none - at root)');
+        
+        return prefix;
+    }
+
+    /**
+     * Determine if we're on the homepage
+     */
+    isHomepage() {
+        const filename = window.location.pathname.split('/').pop() || '';
+        return filename === '' || filename === 'index.html' || filename === '/';
+    }
+
     init() {
         if (this.navElement) {
             this.render();
@@ -31,71 +128,61 @@ class Navigation {
     }
 
     render() {
-        const isHomepage = this.currentPage === 'index';
+        const isHomepage = this.isHomepage();
+        const relPrefix = this.getRelativePrefix();
+        const pageLevel = this.detectPageLevel();
         
-       
-        const rawSegments = window.location.pathname.split('/').filter(Boolean);
-        let segments = rawSegments.slice();
-        const last = segments[segments.length - 1] || '';
-        if (last.indexOf('.') !== -1) {
-            segments = segments.slice(0, -1);
-        }
+        console.log('[Navigation] Page Level:', pageLevel);
+        console.log('[Navigation] Is Homepage?', isHomepage);
+        console.log('[Navigation] Relative Prefix:', relPrefix || '(none - at root)');
 
-        if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
-            segments = segments.slice(1);
-        }
+        // Build paths for logo
+        const logoHref = relPrefix ? `${relPrefix}index.html` : 'index.html';
+        const logoSrc = relPrefix ? `${relPrefix}assets/logo.svg` : 'assets/logo.svg';
 
-        const upLevels = Math.max(0, segments.length);
-        const relPrefix = '../'.repeat(upLevels);
-
-        // Debug logging
-        if (window && window.location && window.console && window.console.debug) {
-            console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
-        }
-
-        //   base tag
-        const baseEl = document.querySelector('base');
-        const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
-        const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
-
-        // SIMPLIFIED LOGO PATH HANDLING
-        let logoHref, logoSrc;
+        // Build navigation links based on current page level
+        let navLinks;
         
-        if (normalizedBase) {
-            logoHref = normalizedBase + 'index.html';
-            logoSrc = normalizedBase + 'assets/logo.svg';
-        } else if (isHomepage) {
-            logoHref = 'index.html';
-            logoSrc = 'assets/logo.svg';
+        if (isHomepage) {
+            // On homepage - use anchor links for same-page sections
+            navLinks = [
+                { name: 'Home', href: '#home', id: 'home', isAnchor: true },
+                { name: 'About', href: '#about', id: 'about', isAnchor: true },
+                { name: 'Hubs', href: '#mood-hubs', id: 'hubs', isAnchor: true },
+                { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
+            ];
+        } else if (pageLevel === 'hubs') {
+            // In hubs folder - go up one level
+            navLinks = [
+                { name: 'Home', href: '../index.html', id: 'home', isAnchor: false },
+                { name: 'About', href: '../index.html#about', id: 'about', isAnchor: false },
+                { name: 'Hubs', href: '../index.html#mood-hubs', id: 'hubs', isAnchor: false },
+                { name: 'Contact', href: '../contact.html', id: 'contact', isAnchor: false }
+            ];
         } else {
-            logoHref = relPrefix + 'index.html';
-            logoSrc = relPrefix + 'assets/logo.svg';
+            // At root level (e.g., contact.html)
+            navLinks = [
+                { name: 'Home', href: 'index.html', id: 'home', isAnchor: false },
+                { name: 'About', href: 'index.html#about', id: 'about', isAnchor: false },
+                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs', isAnchor: false },
+                { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
+            ];
         }
-
-        console.log('[Navigation] Logo paths:', { logoHref, logoSrc, normalizedBase, isHomepage });
-
-        const navLinks = isHomepage 
-            ? [
-                { name: 'Home', href: 'index.html', id: 'index' },
-                { name: 'About', href: '#about', id: 'about' },
-                { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
-                { name: 'Contact', href: 'contact.html', id: 'contact' }
-              ]
-            : [
-                { name: 'Home', href: 'index.html', id: 'index' },
-                { name: 'About', href: 'index.html#about', id: 'about' },
-                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
-                { name: 'Contact', href: 'contact.html', id: 'contact' }
-              ];
 
         const navHTML = `
             <div class="nav-container">
                 <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
-                    <img src="${logoSrc}" alt="FlowState" class="nav-logo__image" onerror="this.style.display='none'; console.error('Logo failed to load:', this.src)">
+                    <img src="${logoSrc}" 
+                         alt="FlowState" 
+                         class="nav-logo__image" 
+                         onerror="console.error('Logo failed to load from:', this.src); this.style.display='none';">
                 </a>
 
                 <!-- Mobile toggle -->
-                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
+                <button class="nav-toggle" 
+                        aria-expanded="false" 
+                        aria-controls="nav-links-list" 
+                        aria-label="Toggle navigation">
                     <span class="visually-hidden">Toggle navigation</span>
                     <span class="nav-toggle__bar"></span>
                     <span class="nav-toggle__bar"></span>
@@ -104,24 +191,14 @@ class Navigation {
 
                 <ul id="nav-links-list" class="nav-links" role="list">
                     ${navLinks.map(link => {
-                        const isActive =
-                            (link.id === 'index' && this.currentPage === 'index') ||
-                            (link.id === 'contact' && this.currentPage === 'contact');
-                        
-                        let href;
-                        if (normalizedBase) {
-                            href = normalizedBase + link.href;
-                        } else if (isHomepage && link.href.startsWith('#')) {
-                            href = link.href;
-                        } else {
-                            href = relPrefix + link.href;
-                        }
+                        const isActive = this.isLinkActive(link.id);
                         
                         return `
                         <li class="nav-item">
-                            <a href="${href}"
+                            <a href="${link.href}"
                                class="nav-link${isActive ? ' active' : ''}"
-                               data-link-id="${link.id}">
+                               data-link-id="${link.id}"
+                               data-is-anchor="${link.isAnchor}">
                                 <span class="nav-link__text">${link.name}</span>
                             </a>
                         </li>
@@ -132,6 +209,37 @@ class Navigation {
         `;
 
         this.navElement.innerHTML = navHTML;
+        
+        // Log all generated links for debugging
+        console.log('[Navigation] Generated links:', navLinks.map(l => `${l.name}: ${l.href}`));
+    }
+
+    /**
+     * Determine if a link should be marked as active
+     */
+    isLinkActive(linkId) {
+        const currentPage = this.currentPage;
+        
+        // Homepage
+        if (linkId === 'home' && (currentPage === 'index' || currentPage === '')) {
+            return true;
+        }
+        
+        // Contact page
+        if (linkId === 'contact' && currentPage === 'contact') {
+            return true;
+        }
+        
+        // Hub pages - check for both naming conventions
+        const hubPages = [
+            'creative-hub', 'energize-hub', 'focus-hub', 'melancholy-hub', 'relax-hub',
+            'creative', 'energize', 'focus', 'melancholy', 'relax'
+        ];
+        if (linkId === 'hubs' && hubPages.includes(currentPage)) {
+            return true;
+        }
+        
+        return false;
     }
 
     attachEvents() {
@@ -141,45 +249,38 @@ class Navigation {
             link.addEventListener('mouseenter', this.handleLinkHover);
             link.addEventListener('mouseleave', this.handleLinkLeave);
 
-            //  clicks handle
+            // Handle clicks
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
-                const isAnchor = href.startsWith('#');
+                const isAnchor = link.getAttribute('data-is-anchor') === 'true';
                 const mobileList = this.navElement.querySelector('.nav-links');
                 const isMobileMenuOpen = mobileList && mobileList.classList.contains('open');
 
-                // if mobile menu is open
+                console.log('[Navigation] Link clicked:', href, 'Is anchor?', isAnchor);
+
+                // If mobile menu is open, close it first
                 if (isMobileMenuOpen) {
                     e.preventDefault();
-                    
-                    // Close menu first
                     this.closeMobileMenu();
-                    
                     
                     setTimeout(() => {
                         if (isAnchor) {
-                            
-                            const targetId = href.substring(1);
-                            const targetElement = document.getElementById(targetId);
-                            if (targetElement) {
-                                const navHeight = this.navElement.offsetHeight;
-                                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
-                                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-                            }
+                            this.scrollToAnchor(href);
                         } else {
-                           
+                            console.log('[Navigation] Navigating to:', href);
                             window.location.href = href;
                         }
                     }, 300);
                 } else if (isAnchor) {
-                   
+                    // Handle anchor links on desktop
                     e.preventDefault();
-                    this.handleAnchorClick(e);
+                    this.scrollToAnchor(href);
                 }
+                // Let normal navigation happen for non-anchor links
             });
         });
 
-       
+        // Mobile menu toggle
         const toggle = this.navElement.querySelector('.nav-toggle');
         if (toggle) {
             toggle.addEventListener('click', (e) => {
@@ -188,13 +289,33 @@ class Navigation {
             });
         }
 
-        
+        // Close mobile menu on resize
         window.addEventListener('resize', () => {
             const mobileList = this.navElement.querySelector('.nav-links');
             if (mobileList && mobileList.classList.contains('open')) {
                 this.closeMobileMenu();
             }
         });
+    }
+
+    /**
+     * Smooth scroll to anchor on the page
+     */
+    scrollToAnchor(href) {
+        const targetId = href.includes('#') ? href.split('#')[1] : href.substring(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+            const navHeight = this.navElement.offsetHeight || 80;
+            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        } else {
+            console.warn('[Navigation] Target element not found:', targetId);
+        }
     }
 
     toggleMobileMenu() {
@@ -213,7 +334,7 @@ class Navigation {
         const mobileList = this.navElement.querySelector('.nav-links');
         if (!mobileList) return;
 
-        
+        // Create overlay
         let overlay = document.getElementById('nav-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -231,24 +352,24 @@ class Navigation {
             if (firstLink) firstLink.focus();
         }
 
-        // stop background scroll
+        // Prevent background scroll
         document.body.style.overflow = 'hidden';
         document.body.classList.add('menu-open');
 
-      
+        // Stagger animation
         const items = Array.from(mobileList.querySelectorAll('.nav-item'));
         items.forEach((it, i) => {
             const delay = i * 45;
             it.style.transitionDelay = `${delay}ms`;
         });
 
-       
+        // Overlay click handler
         overlay.addEventListener('click', this._overlayClickHandler = (e) => {
             e.preventDefault();
             this.closeMobileMenu();
         });
 
-       
+        // Keyboard handler
         this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
         document.addEventListener('keydown', this._mobileKeydownHandler);
     }
@@ -265,7 +386,7 @@ class Navigation {
             toggle.focus();
         }
 
-        
+        // Remove overlay
         const overlay = document.getElementById('nav-overlay');
         if (overlay) {
             overlay.classList.remove('is-visible');
@@ -276,15 +397,15 @@ class Navigation {
             this._overlayClickHandler = null;
         }
 
-       
+        // Restore background scroll
         document.body.style.overflow = '';
         document.body.classList.remove('menu-open');
 
-       
+        // Clear stagger delays
         const items = mobileList.querySelectorAll('.nav-item');
         items.forEach(it => { it.style.transitionDelay = ''; });
 
-        
+        // Remove keyboard handler
         if (this._mobileKeydownHandler) {
             document.removeEventListener('keydown', this._mobileKeydownHandler);
             this._mobileKeydownHandler = null;
@@ -323,34 +444,19 @@ class Navigation {
 
     handleLinkHover(e) {
         const textElement = e.currentTarget.querySelector('.nav-link__text');
-        if (textElement) {
+        if (textElement && typeof gsap !== 'undefined') {
+            gsap.to(textElement, { y: -3, duration: 0.3, ease: 'power2.out' });
+        } else if (textElement) {
             textElement.style.transform = 'translateY(-3px)';
         }
     }
 
     handleLinkLeave(e) {
         const textElement = e.currentTarget.querySelector('.nav-link__text');
-        if (textElement) {
+        if (textElement && typeof gsap !== 'undefined') {
+            gsap.to(textElement, { y: 0, duration: 0.3, ease: 'power2.out' });
+        } else if (textElement) {
             textElement.style.transform = 'translateY(0)';
-        }
-    }
-
-    handleAnchorClick(e) {
-        const href = e.currentTarget.getAttribute('href');
-        if (!href.startsWith('#')) return;
-        
-        e.preventDefault();
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-            const navHeight = this.navElement.offsetHeight;
-            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
         }
     }
 }
@@ -415,17 +521,17 @@ class MoodHubsCarousel {
     }
 
     attachEvents() {
-        // previous btn 
+        // Previous button
         if (this.prevBtn) {
             this.prevBtn.addEventListener('click', () => this.prev());
         }
 
-        // next btnn
+        // Next button
         if (this.nextBtn) {
             this.nextBtn.addEventListener('click', () => this.next());
         }
 
-        // dots
+        // Dots navigation
         if (this.dotsContainer) {
             this.dotsContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('carousel-dot')) {
@@ -435,7 +541,7 @@ class MoodHubsCarousel {
             });
         }
 
-        // keybod navigation
+        // Keyboard navigation
         this.track.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
                 this.prev();
@@ -444,7 +550,7 @@ class MoodHubsCarousel {
             }
         });
 
-        // touch screen support
+        // Touch support
         this.addSwipeSupport();
     }
 
@@ -501,12 +607,19 @@ class MoodHubsCarousel {
     }
 
     updateCarousel() {
-       
         const cardWidth = this.cards[0].offsetWidth;
         const gap = parseFloat(getComputedStyle(this.track).gap) || 0;
         const translateX = -(this.currentIndex * (cardWidth + gap) * this.cardsPerView);
         
-        this.track.style.transform = `translateX(${translateX}px)`;
+        if (typeof gsap !== 'undefined') {
+            gsap.to(this.track, {
+                x: translateX,
+                duration: 0.5,
+                ease: 'power2.out'
+            });
+        } else {
+            this.track.style.transform = `translateX(${translateX}px)`;
+        }
         
         this.updateButtons();
         this.updateDots();
@@ -517,7 +630,7 @@ class MoodHubsCarousel {
     updateButtons() {
         if (!this.prevBtn || !this.nextBtn) return;
 
-        // hide prev button on first slide
+        // Previous button
         if (this.currentIndex === 0) {
             this.prevBtn.disabled = true;
             this.prevBtn.style.opacity = '0';
@@ -528,7 +641,7 @@ class MoodHubsCarousel {
             this.prevBtn.style.pointerEvents = 'auto';
         }
 
-        // hde next button on last slide
+        // Next button
         if (this.currentIndex >= this.totalSlides - 1) {
             this.nextBtn.disabled = true;
             this.nextBtn.style.opacity = '0';
@@ -580,10 +693,10 @@ class MoodHubsCarousel {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // init Navigation
+    // Initialize Navigation
     new Navigation();
     
-    // init Carousel (only if on homepage)
+    // Initialize Carousel (only if on homepage)
     if (document.getElementById('mood-hubs-track')) {
         new MoodHubsCarousel();
     }
