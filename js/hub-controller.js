@@ -24,7 +24,7 @@ class HubController {
         this.movieRenderer = new MovieRenderer();
         
         // Initialize RAWG API for games
-        let rawgKey = 'YOUR_RAWG_API_KEY_HERE';
+        let rawgKey = '35ff0bb7928b4adeaa14c5fced1a69ad';
         try {
             if (typeof API_CONFIG !== 'undefined' && API_CONFIG.rawg && API_CONFIG.rawg.apiKey) {
                 rawgKey = API_CONFIG.rawg.apiKey;
