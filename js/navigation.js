@@ -30,95 +30,112 @@ class Navigation {
         }
     }
 
-    render() {
-        const isHomepage = this.currentPage === 'index';
+render() {
+    const isHomepage = this.currentPage === 'index';
+    
     // compute a relative prefix to reach site root from current path
-        // robustly handle file:// paths and nested folders
-        const rawSegments = window.location.pathname.split('/').filter(Boolean);
-        // remove filename if present (contains a dot, e.g., index.html)
-        let segments = rawSegments.slice();
-        const last = segments[segments.length - 1] || '';
-        if (last.indexOf('.') !== -1) {
-            segments = segments.slice(0, -1);
-        }
-
-    
-        if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
-            segments = segments.slice(1);
-        }
-
-        const upLevels = Math.max(0, segments.length);
-        const relPrefix = '../'.repeat(upLevels);
-
-    
-        if (window && window.location && window.console && window.console.debug) {
-            console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
-        }
-
-        // If a <base> tag is present (useful for GitHub Pages project sites), prefer that for building hrefs.
-        // Example: <base href="/repo-name/"> will make links resolve to /repo-name/index.html etc.
-        const baseEl = document.querySelector && document.querySelector('base');
-        const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
-        const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
-
-        // compute logo href/src depending on presence of base
-        const logoHref = normalizedBase ? (normalizedBase + 'index.html') : (relPrefix + 'index.html');
-        const logoSrc = normalizedBase ? (normalizedBase + 'assets/logo.svg') : (relPrefix + 'assets/logo.svg');
-        
-        const navLinks = isHomepage 
-            ? [
-                { name: 'Home', href: 'index.html', id: 'index' },
-                { name: 'About', href: '#about', id: 'about' },
-                { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
-                { name: 'Contact', href: 'contact.html', id: 'contact' }
-              ]
-            : [
-                { name: 'Home', href: 'index.html', id: 'index' },
-                { name: 'About', href: 'index.html#about', id: 'about' },
-                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
-                { name: 'Contact', href: 'contact.html', id: 'contact' }
-              ];
-
-
-        const navHTML = `
-            <div class="nav-container">
-                <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
-                    <img src="${logoSrc}" alt="FlowState" class="nav-logo__image">
-                </a>
-
-                <!-- Mobile toggle -->
-                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
-                    <span class="visually-hidden">Toggle navigation</span>
-                    <span class="nav-toggle__bar"></span>
-                    <span class="nav-toggle__bar"></span>
-                    <span class="nav-toggle__bar"></span>
-                </button>
-
-                <ul id="nav-links-list" class="nav-links" role="list">
-                    ${navLinks.map(link => {
-                        const isActive =
-                            (link.id === 'index' && this.currentPage === 'index') ||
-                            (link.id === 'contact' && this.currentPage === 'contact');
-                        // If a base href is declared, build links from it; otherwise use relPrefix.
-                        const href = normalizedBase
-                            ? (normalizedBase + link.href)
-                            : (isHomepage && link.href.startsWith('#') ? link.href : (relPrefix + link.href));
-                        return `
-                        <li class="nav-item">
-                            <a href="${href}"
-                               class="nav-link${isActive ? ' active' : ''}"
-                               data-link-id="${link.id}">
-                                <span class="nav-link__text">${link.name}</span>
-                            </a>
-                        </li>
-                        `;
-                    }).join('')}
-                </ul>
-            </div>
-        `;
-
-        this.navElement.innerHTML = navHTML;
+    const rawSegments = window.location.pathname.split('/').filter(Boolean);
+    let segments = rawSegments.slice();
+    const last = segments[segments.length - 1] || '';
+    if (last.indexOf('.') !== -1) {
+        segments = segments.slice(0, -1);
     }
+
+    if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
+        segments = segments.slice(1);
+    }
+
+    const upLevels = Math.max(0, segments.length);
+    const relPrefix = '../'.repeat(upLevels);
+
+    // Debug logging
+    if (window && window.location && window.console && window.console.debug) {
+        console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
+    }
+
+    // Check for base tag
+    const baseEl = document.querySelector('base');
+    const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
+    const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
+
+    // SIMPLIFIED LOGO PATH HANDLING
+    let logoHref, logoSrc;
+    
+    if (normalizedBase) {
+        // If base tag exists, use absolute paths from base
+        logoHref = normalizedBase + 'index.html';
+        logoSrc = normalizedBase + 'assets/logo.svg';
+    } else if (isHomepage) {
+        // On homepage with no base tag
+        logoHref = 'index.html';
+        logoSrc = 'assets/logo.svg';
+    } else {
+        // On other pages with no base tag
+        logoHref = relPrefix + 'index.html';
+        logoSrc = relPrefix + 'assets/logo.svg';
+    }
+
+    console.log('[Navigation] Logo paths:', { logoHref, logoSrc, normalizedBase, isHomepage });
+
+    const navLinks = isHomepage 
+        ? [
+            { name: 'Home', href: 'index.html', id: 'index' },
+            { name: 'About', href: '#about', id: 'about' },
+            { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
+            { name: 'Contact', href: 'contact.html', id: 'contact' }
+          ]
+        : [
+            { name: 'Home', href: 'index.html', id: 'index' },
+            { name: 'About', href: 'index.html#about', id: 'about' },
+            { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
+            { name: 'Contact', href: 'contact.html', id: 'contact' }
+          ];
+
+    const navHTML = `
+        <div class="nav-container">
+            <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
+                <img src="${logoSrc}" alt="FlowState" class="nav-logo__image" onerror="this.style.display='none'; console.error('Logo failed to load:', this.src)">
+            </a>
+
+            <!-- Mobile toggle -->
+            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="nav-toggle__bar"></span>
+                <span class="nav-toggle__bar"></span>
+                <span class="nav-toggle__bar"></span>
+            </button>
+
+            <ul id="nav-links-list" class="nav-links" role="list">
+                ${navLinks.map(link => {
+                    const isActive =
+                        (link.id === 'index' && this.currentPage === 'index') ||
+                        (link.id === 'contact' && this.currentPage === 'contact');
+                    
+                    let href;
+                    if (normalizedBase) {
+                        href = normalizedBase + link.href;
+                    } else if (isHomepage && link.href.startsWith('#')) {
+                        href = link.href;
+                    } else {
+                        href = relPrefix + link.href;
+                    }
+                    
+                    return `
+                    <li class="nav-item">
+                        <a href="${href}"
+                           class="nav-link${isActive ? ' active' : ''}"
+                           data-link-id="${link.id}">
+                            <span class="nav-link__text">${link.name}</span>
+                        </a>
+                    </li>
+                    `;
+                }).join('')}
+            </ul>
+        </div>
+    `;
+
+    this.navElement.innerHTML = navHTML;
+}
 
     attachEvents() {
         const navLinks = this.navElement.querySelectorAll('.nav-link');

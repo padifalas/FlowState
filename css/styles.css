@@ -187,10 +187,20 @@ ul {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: color var(--transition-fast);
+     margin-left: -60px;
 }
 
-.nav-logo:hover {
-    color: var(--color-accent-red);
+.nav-logo__image {
+    display: block;
+    height: 50px;
+    width: auto;
+    max-width: 100%;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.nav-logo:hover .nav-logo__image {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(85%) saturate(1490%) hue-rotate(335deg) brightness(95%) contrast(95%);
+    transform: rotate(-5deg) scale(1.1);
 }
 
 .nav-logo__text {
