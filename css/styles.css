@@ -563,8 +563,8 @@ ul {
     position: relative;
     background: var(--color-text-primary);
     border-radius: 1.5vw;
-    padding: 2vw 1.8vw;
-    min-height: 22vw;
+    padding: 1.5vw 1.5vw;
+    min-height: 18vw;
     flex: 0 0 calc(33.333% - 1.35vw);
     display: flex;
     flex-direction: column;
@@ -852,7 +852,7 @@ ul {
 @media (max-width: 1024px) {
     .hub-card {
         flex: 0 0 calc(50% - 1vw);
-        min-height: 28vw;
+        min-height: 22vw;
     }
     
     .hub-card__icon {
@@ -877,8 +877,8 @@ ul {
     
     .hub-card {
         flex: 0 0 85%;
-        min-height: 400px;
-        padding: 2rem 1.5rem;
+        min-height: 320px;
+        padding: 1.8rem 1.2rem;
         border-radius: 20px;
     }
     
@@ -1010,9 +1010,9 @@ ul {
     
     .hub-card {
         flex: 0 0 90%;
-        padding: 1.5rem 1rem;
+        padding: 1.2rem 1rem;
         border-radius: 16px;
-        min-height: 380px;
+        min-height: 300px;
     }
     
     .hub-card__title {
