@@ -187,7 +187,8 @@ ul {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: color var(--transition-fast);
-     margin-left: -60px;
+margin-left: 0; 
+    z-index: 1100; 
 }
 
 .nav-logo__image {
@@ -197,7 +198,24 @@ ul {
     max-width: 100%;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
+/* 4 mobile logo sizing */
+@media (max-width: 768px) {
+    .nav-logo__image {
+        height: 40px; 
+    }
+    
+    .nav-logo {
+        margin-left: 0; 
+        position: relative;
+        z-index: 1100;
+    }
+}
 
+@media (max-width: 480px) {
+    .nav-logo__image {
+        height: 35px; 
+    }
+}
 .nav-logo:hover .nav-logo__image {
     filter: brightness(0) saturate(100%) invert(27%) sepia(85%) saturate(1490%) hue-rotate(335deg) brightness(95%) contrast(95%);
     transform: rotate(-5deg) scale(1.1);
@@ -951,7 +969,7 @@ ul {
     /* animated dropdown panel */
     .nav-links {
         display: flex; 
-        position: absolute;
+        position: fixed;
         top: 100%;
         left: 0;
         right: 0;
@@ -962,6 +980,9 @@ ul {
         padding: 1rem 1.5rem;
         border-bottom: 1px solid rgba(240,236,217,0.04);
         box-shadow: var(--shadow-md);
+        height: auto;
+        max-height: calc(100 vh - 100px);
+        overflow: auto;
 
         /* hidden state - usess transform & opacity to animate smoothly */
         transform-origin: top center;
@@ -969,6 +990,7 @@ ul {
         opacity: 0;
         pointer-events: none;
         transition: transform 360ms cubic-bezier(.2,.9,.3,1), opacity 240ms cubic-bezier(.2,.9,.3,1);
+        z-index: 1000;
     }
 
     .nav-links.open {
@@ -979,7 +1001,6 @@ ul {
 
     .nav-links .nav-item {
         padding: 0.5rem 0;
-        /* children animate in with slight upward motion */
         transform: translateY(-6px);
         opacity: 0;
         transition: transform 360ms cubic-bezier(.2,.9,.3,1), opacity 300ms ease;
@@ -996,6 +1017,10 @@ ul {
         color: var(--color-text-primary);
     }
 
+        .nav-links .nav-link[href*="#"] {
+        pointer-events: auto !important;
+    }
+
     /* fullscreen overlay behind the menu to dim content and capture clicks */
     .nav-overlay {
         position: fixed;
@@ -1010,6 +1035,9 @@ ul {
     .nav-overlay.is-visible {
         opacity: 1;
         pointer-events: auto;
+    }
+        body.menu-open {
+        overflow: hidden;
     }
 }
 
