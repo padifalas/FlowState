@@ -575,6 +575,7 @@ ul {
     will-change: transform;
 }
 
+
 .hub-card:hover {
     transform: translateY(-0.8vw) rotate(0deg) !important;
     box-shadow: 0 1.5vw 4vw rgba(0, 0, 0, 0.3);
