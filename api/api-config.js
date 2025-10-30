@@ -20,7 +20,21 @@ const API_CONFIG = {
             discover: '/discover/movie',
             search: '/search/movie'
         }
+    },
+
+        rawg: {
+        baseURL: 'https://api.rawg.io/api',
+        apiKey: (typeof window !== 'undefined' && window.API_SECRETS && window.API_SECRETS.rawg && window.API_SECRETS.rawg.apiKey) 
+            ? window.API_SECRETS.rawg.apiKey 
+            : '35ff0bb7928b4adeaa14c5fced1a69ad',
+        endpoints: {
+            games: '/games',
+            tags: '/tags',
+            genres: '/genres'
+        }
     }
+
+    
 };
 
 // ============================================
@@ -211,10 +225,65 @@ const MOOD_MOVIE_QUERIES = {
     }
 };
 
+
+// ============================================
+// MOOD-BASED GAME QUERIES
+// ============================================
+
+const MOOD_GAME_QUERIES = {
+    focus: {
+        tags: ['puzzle', 'strategy', 'logic', 'minimalist', 'relaxing', 'educational'],
+        genres: ['puzzle', 'strategy', 'educational'],
+        excludeTags: ['multiplayer', 'competitive', 'violent'],
+        description: 'Logic puzzles and strategy games for mental clarity',
+        sortBy: '-rating', // highest rated
+        pageSize: 12
+    },
+    relax: {
+        tags: ['relaxing', 'casual', 'cozy', 'atmospheric', 'peaceful', 'sandbox'],
+        genres: ['casual', 'simulation', 'adventure'],
+        excludeTags: ['horror', 'violent', 'fast-paced'],
+        description: 'Calming and peaceful games for unwinding',
+        sortBy: '-rating',
+        pageSize: 12
+    },
+    energize: {
+        tags: ['fast-paced', 'action', 'arcade', 'challenging', 'competitive', 'platformer'],
+        genres: ['action', 'racing', 'sports', 'arcade'],
+        excludeTags: ['horror', 'slow-paced'],
+        description: 'High-energy games to boost adrenaline',
+        sortBy: '-added', // recently added
+        pageSize: 12
+    },
+    creative: {
+        tags: ['creative', 'sandbox', 'building', 'artistic', 'experimental', 'indie'],
+        genres: ['indie', 'simulation', 'adventure'],
+        excludeTags: ['violent', 'horror'],
+        description: 'Creative and experimental games for inspiration',
+        sortBy: '-rating',
+        pageSize: 12
+    },
+    melancholy: {
+        tags: ['atmospheric', 'story-rich', 'emotional', 'narrative', 'exploration', 'artistic'],
+        genres: ['adventure', 'indie', 'rpg'],
+        excludeTags: ['horror', 'comedy', 'action'],
+        description: 'Contemplative games with deep narratives',
+        sortBy: '-rating',
+        pageSize: 12
+    }
+};
+
+
 // ============================================
 // EXPORT CONFIGURATION
 // ============================================
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { API_CONFIG, MOOD_QUERIES, TMDB_GENRES, MOOD_MOVIE_QUERIES };
+    module.exports = {
+         API_CONFIG,
+         MOOD_QUERIES, 
+         TMDB_GENRES,
+        MOOD_MOVIE_QUERIES,
+        MOOD_GAME_QUERIES 
+         };
 }
