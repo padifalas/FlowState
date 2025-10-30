@@ -703,18 +703,38 @@ ul {
 }
 
 .hub-card__icon {
-    width: 4vw;
-    height: 4vw;
+    width: 18vw;
+    height: 18vw;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.5vw;
+    margin-bottom: 2.5vw;
 }
 
 .hub-card__icon img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    max-width: 17vw;
+    max-height: 17vw;
+    filter: drop-shadow(0 0 2vw var(--hub-icon-glow, var(--color-accent-red)));
+    transition: filter 0.3s;
+}
+/* Hub icon aura accent colors */
+.hub-card[data-hub="focus"] .hub-card__icon img {
+    --hub-icon-glow: var(--color-accent-red);
+}
+.hub-card[data-hub="relax"] .hub-card__icon img {
+    --hub-icon-glow: var(--color-accent-coral);
+}
+.hub-card[data-hub="energize"] .hub-card__icon img {
+    --hub-icon-glow: var(--color-accent-amber);
+}
+.hub-card[data-hub="creative"] .hub-card__icon img {
+    --hub-icon-glow: var(--color-accent-purple);
+}
+.hub-card[data-hub="melancholy"] .hub-card__icon img {
+    --hub-icon-glow: var(--color-accent-gray);
 }
 
 .hub-card__text {
@@ -836,8 +856,12 @@ ul {
     }
     
     .hub-card__icon {
-        width: 5vw;
-        height: 5vw;
+        width: 15vw;
+        height: 15vw;
+    }
+    .hub-card__icon img {
+        max-width: 14vw;
+        max-height: 14vw;
     }
 }
 
@@ -867,8 +891,12 @@ ul {
     }
     
     .hub-card__icon {
-        width: 60px;
-        height: 60px;
+        width: 160px;
+        height: 160px;
+    }
+    .hub-card__icon img {
+        max-width: 120px;
+        max-height: 120px;
     }
     
     .hub-card__text {
