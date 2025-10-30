@@ -1,11 +1,6 @@
 // ============================================
 // NAVIGATION SYSTEM
 // ============================================
-// In the openMobileMenu method, add:
-document.body.classList.add('menu-open');
-
-// In the closeMobileMenu method, add:
-document.body.classList.remove('menu-open');
 
 class Navigation {
     constructor() {
@@ -35,112 +30,109 @@ class Navigation {
         }
     }
 
-render() {
-    const isHomepage = this.currentPage === 'index';
-    
-    // compute a relative prefix to reach site root from current path
-    const rawSegments = window.location.pathname.split('/').filter(Boolean);
-    let segments = rawSegments.slice();
-    const last = segments[segments.length - 1] || '';
-    if (last.indexOf('.') !== -1) {
-        segments = segments.slice(0, -1);
+    render() {
+        const isHomepage = this.currentPage === 'index';
+        
+       
+        const rawSegments = window.location.pathname.split('/').filter(Boolean);
+        let segments = rawSegments.slice();
+        const last = segments[segments.length - 1] || '';
+        if (last.indexOf('.') !== -1) {
+            segments = segments.slice(0, -1);
+        }
+
+        if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
+            segments = segments.slice(1);
+        }
+
+        const upLevels = Math.max(0, segments.length);
+        const relPrefix = '../'.repeat(upLevels);
+
+        // Debug logging
+        if (window && window.location && window.console && window.console.debug) {
+            console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
+        }
+
+        //   base tag
+        const baseEl = document.querySelector('base');
+        const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
+        const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
+
+        // SIMPLIFIED LOGO PATH HANDLING
+        let logoHref, logoSrc;
+        
+        if (normalizedBase) {
+            logoHref = normalizedBase + 'index.html';
+            logoSrc = normalizedBase + 'assets/logo.svg';
+        } else if (isHomepage) {
+            logoHref = 'index.html';
+            logoSrc = 'assets/logo.svg';
+        } else {
+            logoHref = relPrefix + 'index.html';
+            logoSrc = relPrefix + 'assets/logo.svg';
+        }
+
+        console.log('[Navigation] Logo paths:', { logoHref, logoSrc, normalizedBase, isHomepage });
+
+        const navLinks = isHomepage 
+            ? [
+                { name: 'Home', href: 'index.html', id: 'index' },
+                { name: 'About', href: '#about', id: 'about' },
+                { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
+                { name: 'Contact', href: 'contact.html', id: 'contact' }
+              ]
+            : [
+                { name: 'Home', href: 'index.html', id: 'index' },
+                { name: 'About', href: 'index.html#about', id: 'about' },
+                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
+                { name: 'Contact', href: 'contact.html', id: 'contact' }
+              ];
+
+        const navHTML = `
+            <div class="nav-container">
+                <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
+                    <img src="${logoSrc}" alt="FlowState" class="nav-logo__image" onerror="this.style.display='none'; console.error('Logo failed to load:', this.src)">
+                </a>
+
+                <!-- Mobile toggle -->
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
+                    <span class="visually-hidden">Toggle navigation</span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                </button>
+
+                <ul id="nav-links-list" class="nav-links" role="list">
+                    ${navLinks.map(link => {
+                        const isActive =
+                            (link.id === 'index' && this.currentPage === 'index') ||
+                            (link.id === 'contact' && this.currentPage === 'contact');
+                        
+                        let href;
+                        if (normalizedBase) {
+                            href = normalizedBase + link.href;
+                        } else if (isHomepage && link.href.startsWith('#')) {
+                            href = link.href;
+                        } else {
+                            href = relPrefix + link.href;
+                        }
+                        
+                        return `
+                        <li class="nav-item">
+                            <a href="${href}"
+                               class="nav-link${isActive ? ' active' : ''}"
+                               data-link-id="${link.id}">
+                                <span class="nav-link__text">${link.name}</span>
+                            </a>
+                        </li>
+                        `;
+                    }).join('')}
+                </ul>
+            </div>
+        `;
+
+        this.navElement.innerHTML = navHTML;
     }
-
-    if (segments.length && /^[A-Za-z]:$/.test(segments[0])) {
-        segments = segments.slice(1);
-    }
-
-    const upLevels = Math.max(0, segments.length);
-    const relPrefix = '../'.repeat(upLevels);
-
-    // Debug logging
-    if (window && window.location && window.console && window.console.debug) {
-        console.debug('[Navigation] pathname=', window.location.pathname, 'segments=', rawSegments, 'dirs=', segments, 'relPrefix=', relPrefix);
-    }
-
-    // Check for base tag
-    const baseEl = document.querySelector('base');
-    const baseHrefRaw = baseEl ? baseEl.getAttribute('href') : null;
-    const normalizedBase = baseHrefRaw ? (baseHrefRaw.endsWith('/') ? baseHrefRaw : baseHrefRaw + '/') : null;
-
-    // SIMPLIFIED LOGO PATH HANDLING
-    let logoHref, logoSrc;
-    
-    if (normalizedBase) {
-        // If base tag exists, use absolute paths from base
-        logoHref = normalizedBase + 'index.html';
-        logoSrc = normalizedBase + 'assets/logo.svg';
-    } else if (isHomepage) {
-        // On homepage with no base tag
-        logoHref = 'index.html';
-        logoSrc = 'assets/logo.svg';
-    } else {
-        // On other pages with no base tag
-        logoHref = relPrefix + 'index.html';
-        logoSrc = relPrefix + 'assets/logo.svg';
-    }
-
-    console.log('[Navigation] Logo paths:', { logoHref, logoSrc, normalizedBase, isHomepage });
-
-    const navLinks = isHomepage 
-        ? [
-            { name: 'Home', href: 'index.html', id: 'index' },
-            { name: 'About', href: '#about', id: 'about' },
-            { name: 'Hubs', href: '#mood-hubs', id: 'hubs' },
-            { name: 'Contact', href: 'contact.html', id: 'contact' }
-          ]
-        : [
-            { name: 'Home', href: 'index.html', id: 'index' },
-            { name: 'About', href: 'index.html#about', id: 'about' },
-            { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs' },
-            { name: 'Contact', href: 'contact.html', id: 'contact' }
-          ];
-
-    const navHTML = `
-        <div class="nav-container">
-            <a href="${logoHref}" class="nav-logo" aria-label="FlowState Home">
-                <img src="${logoSrc}" alt="FlowState" class="nav-logo__image" onerror="this.style.display='none'; console.error('Logo failed to load:', this.src)">
-            </a>
-
-            <!-- Mobile toggle -->
-            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links-list" aria-label="Toggle navigation">
-                <span class="visually-hidden">Toggle navigation</span>
-                <span class="nav-toggle__bar"></span>
-                <span class="nav-toggle__bar"></span>
-                <span class="nav-toggle__bar"></span>
-            </button>
-
-            <ul id="nav-links-list" class="nav-links" role="list">
-                ${navLinks.map(link => {
-                    const isActive =
-                        (link.id === 'index' && this.currentPage === 'index') ||
-                        (link.id === 'contact' && this.currentPage === 'contact');
-                    
-                    let href;
-                    if (normalizedBase) {
-                        href = normalizedBase + link.href;
-                    } else if (isHomepage && link.href.startsWith('#')) {
-                        href = link.href;
-                    } else {
-                        href = relPrefix + link.href;
-                    }
-                    
-                    return `
-                    <li class="nav-item">
-                        <a href="${href}"
-                           class="nav-link${isActive ? ' active' : ''}"
-                           data-link-id="${link.id}">
-                            <span class="nav-link__text">${link.name}</span>
-                        </a>
-                    </li>
-                    `;
-                }).join('')}
-            </ul>
-        </div>
-    `;
-
-    this.navElement.innerHTML = navHTML;
-}
 
     attachEvents() {
         const navLinks = this.navElement.querySelectorAll('.nav-link');
@@ -149,44 +141,45 @@ render() {
             link.addEventListener('mouseenter', this.handleLinkHover);
             link.addEventListener('mouseleave', this.handleLinkLeave);
 
-            if (link.getAttribute('href').startsWith('#')) {
-                link.addEventListener('click', this.handleAnchorClick);
-            }
+            //  clicks handle
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                const isAnchor = href.startsWith('#');
+                const mobileList = this.navElement.querySelector('.nav-links');
+                const isMobileMenuOpen = mobileList && mobileList.classList.contains('open');
 
-            // wil close   menu when a nav link is clicked 
-link.addEventListener('click', (e) => {
-    const mobileList = this.navElement.querySelector('.nav-links');
-
-    if (mobileList && mobileList.classList.contains('open')) {
-        const href = link.getAttribute('href');
-        const isAnchor = href.startsWith('#');
-
-        // close the menu first
-        this.closeMobileMenu();
-
-        // navigate *after* the menu closes
-        setTimeout(() => {
-            if (isAnchor) {
-                // smooth scroll for in-page anchors
-                const targetId = href.substring(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    const navHeight = document.getElementById('main-navigation').offsetHeight;
-                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
-                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                // if mobile menu is open
+                if (isMobileMenuOpen) {
+                    e.preventDefault();
+                    
+                    // Close menu first
+                    this.closeMobileMenu();
+                    
+                    
+                    setTimeout(() => {
+                        if (isAnchor) {
+                            
+                            const targetId = href.substring(1);
+                            const targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                const navHeight = this.navElement.offsetHeight;
+                                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+                                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                            }
+                        } else {
+                           
+                            window.location.href = href;
+                        }
+                    }, 300);
+                } else if (isAnchor) {
+                   
+                    e.preventDefault();
+                    this.handleAnchorClick(e);
                 }
-            } else {
-                // normal navigation for other pages
-                window.location.href = href;
-            }
-        }, 250); // wait a bit for close animation
-        e.preventDefault(); // prevent immediate default behavior
-    }
-});
-
+            });
         });
 
-        // Mobile toggle button
+       
         const toggle = this.navElement.querySelector('.nav-toggle');
         if (toggle) {
             toggle.addEventListener('click', (e) => {
@@ -195,7 +188,7 @@ link.addEventListener('click', (e) => {
             });
         }
 
-        //menu will be closed 
+        
         window.addEventListener('resize', () => {
             const mobileList = this.navElement.querySelector('.nav-links');
             if (mobileList && mobileList.classList.contains('open')) {
@@ -220,7 +213,7 @@ link.addEventListener('click', (e) => {
         const mobileList = this.navElement.querySelector('.nav-links');
         if (!mobileList) return;
 
-        // add overlay
+        
         let overlay = document.getElementById('nav-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -228,39 +221,36 @@ link.addEventListener('click', (e) => {
             overlay.className = 'nav-overlay';
             document.body.appendChild(overlay);
         }
-        // allow transition
         requestAnimationFrame(() => overlay.classList.add('is-visible'));
 
         mobileList.classList.add('open');
         if (toggle) {
             toggle.setAttribute('aria-expanded', 'true');
             toggle.classList.add('is-open');
-            // move focus to first link for accessibility
             const firstLink = mobileList.querySelector('.nav-link');
             if (firstLink) firstLink.focus();
         }
 
-        // prevent background scroll
+        // stop background scroll
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('menu-open');
 
-        // stagger children animation delays
+      
         const items = Array.from(mobileList.querySelectorAll('.nav-item'));
         items.forEach((it, i) => {
-            const delay = i * 45; // ms
+            const delay = i * 45;
             it.style.transitionDelay = `${delay}ms`;
         });
 
-        // overlay click closes menu
+       
         overlay.addEventListener('click', this._overlayClickHandler = (e) => {
             e.preventDefault();
             this.closeMobileMenu();
         });
 
-        // keydown handler for ESC and focus trap
+       
         this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
         document.addEventListener('keydown', this._mobileKeydownHandler);
-
-         document.body.classList.add('menu-open');
     }
 
     closeMobileMenu() {
@@ -275,30 +265,30 @@ link.addEventListener('click', (e) => {
             toggle.focus();
         }
 
-        // remove overlay
+        
         const overlay = document.getElementById('nav-overlay');
         if (overlay) {
             overlay.classList.remove('is-visible');
-            // remove after transition
             setTimeout(() => overlay.remove(), 300);
-            if (this._overlayClickHandler) overlay.removeEventListener('click', this._overlayClickHandler);
+            if (this._overlayClickHandler) {
+                overlay.removeEventListener('click', this._overlayClickHandler);
+            }
             this._overlayClickHandler = null;
         }
 
-        // re-enable background scroll
+       
         document.body.style.overflow = '';
+        document.body.classList.remove('menu-open');
 
-        // clear stagger inline styles
+       
         const items = mobileList.querySelectorAll('.nav-item');
         items.forEach(it => { it.style.transitionDelay = ''; });
 
-        // remove keydown handler
+        
         if (this._mobileKeydownHandler) {
             document.removeEventListener('keydown', this._mobileKeydownHandler);
             this._mobileKeydownHandler = null;
         }
-
-        document.body.classList.remove('menu-open');
     }
 
     _handleMobileKeydown(e) {
@@ -312,7 +302,6 @@ link.addEventListener('click', (e) => {
         }
 
         if (e.key === 'Tab') {
-            // focus trap
             const focusable = mobileList.querySelectorAll('a, button');
             if (!focusable.length) return;
             const first = focusable[0];
@@ -347,12 +336,15 @@ link.addEventListener('click', (e) => {
     }
 
     handleAnchorClick(e) {
+        const href = e.currentTarget.getAttribute('href');
+        if (!href.startsWith('#')) return;
+        
         e.preventDefault();
-        const targetId = e.currentTarget.getAttribute('href').substring(1);
+        const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
         
         if (targetElement) {
-            const navHeight = document.getElementById('main-navigation').offsetHeight;
+            const navHeight = this.navElement.offsetHeight;
             const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
             
             window.scrollTo({
@@ -360,7 +352,7 @@ link.addEventListener('click', (e) => {
                 behavior: 'smooth'
             });
         }
-    }    
+    }
 }
 
 // ============================================
@@ -423,41 +415,12 @@ class MoodHubsCarousel {
     }
 
     attachEvents() {
-
-            const navLinks = this.navElement.querySelectorAll('.nav-link');
-
-    navLinks.forEach(link => {
-        link.addEventListener('mouseenter', this.handleLinkHover);
-        link.addEventListener('mouseleave', this.handleLinkLeave);
-
-        // Handle anchor links
-        if (link.getAttribute('href').startsWith('#')) {
-            link.addEventListener('click', this.handleAnchorClick);
-        }
-
-        // Close mobile menu when any link is clicked
-        link.addEventListener('click', (e) => {
-            const mobileList = this.navElement.querySelector('.nav-links');
-            if (mobileList && mobileList.classList.contains('open')) {
-                this.closeMobileMenu();
-                
-                // If it's an anchor link, let the default behavior happen after a delay
-                if (link.getAttribute('href').startsWith('#')) {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href').substring(1);
-                    setTimeout(() => {
-                        this.handleAnchorClick(e);
-                    }, 300);
-                }
-            }
-        });
-    });
-        // previous button
+        // previous btn 
         if (this.prevBtn) {
             this.prevBtn.addEventListener('click', () => this.prev());
         }
 
-        // next button
+        // next btnn
         if (this.nextBtn) {
             this.nextBtn.addEventListener('click', () => this.next());
         }
@@ -472,7 +435,7 @@ class MoodHubsCarousel {
             });
         }
 
-        // trying keyboard navigation
+        // keybod navigation
         this.track.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
                 this.prev();
@@ -481,7 +444,7 @@ class MoodHubsCarousel {
             }
         });
 
-        // touhscreen/swipe support
+        // touch screen support
         this.addSwipeSupport();
     }
 
@@ -538,19 +501,15 @@ class MoodHubsCarousel {
     }
 
     updateCarousel() {
-        // cal transform
+       
         const cardWidth = this.cards[0].offsetWidth;
         const gap = parseFloat(getComputedStyle(this.track).gap) || 0;
         const translateX = -(this.currentIndex * (cardWidth + gap) * this.cardsPerView);
         
         this.track.style.transform = `translateX(${translateX}px)`;
-
-       
-        this.updateButtons();
         
-       
+        this.updateButtons();
         this.updateDots();
-
         
         this.track.setAttribute('aria-live', 'polite');
     }
@@ -558,7 +517,7 @@ class MoodHubsCarousel {
     updateButtons() {
         if (!this.prevBtn || !this.nextBtn) return;
 
-        // hide on prev btn first slide
+        // hide prev button on first slide
         if (this.currentIndex === 0) {
             this.prevBtn.disabled = true;
             this.prevBtn.style.opacity = '0';
@@ -569,7 +528,7 @@ class MoodHubsCarousel {
             this.prevBtn.style.pointerEvents = 'auto';
         }
 
-        //  hide next btn last slide
+        // hde next button on last slide
         if (this.currentIndex >= this.totalSlides - 1) {
             this.nextBtn.disabled = true;
             this.nextBtn.style.opacity = '0';
@@ -603,7 +562,7 @@ class MoodHubsCarousel {
             this.cardsPerView = newCardsPerView;
             this.totalSlides = Math.ceil(this.cards.length / this.cardsPerView);
             
-            // wil;; reset to first slide if current index is out of bounds
+            // Reset to first slide if current index is out of bounds
             if (this.currentIndex >= this.totalSlides) {
                 this.currentIndex = this.totalSlides - 1;
             }
@@ -621,13 +580,14 @@ class MoodHubsCarousel {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Navigation
+    // init Navigation
     new Navigation();
     
-    // Initialize Carousel
-    new MoodHubsCarousel();
+    // init Carousel (only if on homepage)
+    if (document.getElementById('mood-hubs-track')) {
+        new MoodHubsCarousel();
+    }
 });
-
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { Navigation, MoodHubsCarousel };
