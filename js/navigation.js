@@ -1,6 +1,11 @@
 // ============================================
 // NAVIGATION SYSTEM
 // ============================================
+// In the openMobileMenu method, add:
+document.body.classList.add('menu-open');
+
+// In the closeMobileMenu method, add:
+document.body.classList.remove('menu-open');
 
 class Navigation {
     constructor() {
@@ -149,12 +154,36 @@ render() {
             }
 
             // wil close   menu when a nav link is clicked 
-            link.addEventListener('click', () => {
-                const mobileList = this.navElement.querySelector('.nav-links');
-                if (mobileList && mobileList.classList.contains('open')) {
-                    this.closeMobileMenu();
+link.addEventListener('click', (e) => {
+    const mobileList = this.navElement.querySelector('.nav-links');
+
+    if (mobileList && mobileList.classList.contains('open')) {
+        const href = link.getAttribute('href');
+        const isAnchor = href.startsWith('#');
+
+        // close the menu first
+        this.closeMobileMenu();
+
+        // navigate *after* the menu closes
+        setTimeout(() => {
+            if (isAnchor) {
+                // smooth scroll for in-page anchors
+                const targetId = href.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const navHeight = document.getElementById('main-navigation').offsetHeight;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
                 }
-            });
+            } else {
+                // normal navigation for other pages
+                window.location.href = href;
+            }
+        }, 250); // wait a bit for close animation
+        e.preventDefault(); // prevent immediate default behavior
+    }
+});
+
         });
 
         // Mobile toggle button
@@ -230,6 +259,8 @@ render() {
         // keydown handler for ESC and focus trap
         this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
         document.addEventListener('keydown', this._mobileKeydownHandler);
+
+         document.body.classList.add('menu-open');
     }
 
     closeMobileMenu() {
@@ -266,6 +297,8 @@ render() {
             document.removeEventListener('keydown', this._mobileKeydownHandler);
             this._mobileKeydownHandler = null;
         }
+
+        document.body.classList.remove('menu-open');
     }
 
     _handleMobileKeydown(e) {
@@ -390,6 +423,35 @@ class MoodHubsCarousel {
     }
 
     attachEvents() {
+
+            const navLinks = this.navElement.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', this.handleLinkHover);
+        link.addEventListener('mouseleave', this.handleLinkLeave);
+
+        // Handle anchor links
+        if (link.getAttribute('href').startsWith('#')) {
+            link.addEventListener('click', this.handleAnchorClick);
+        }
+
+        // Close mobile menu when any link is clicked
+        link.addEventListener('click', (e) => {
+            const mobileList = this.navElement.querySelector('.nav-links');
+            if (mobileList && mobileList.classList.contains('open')) {
+                this.closeMobileMenu();
+                
+                // If it's an anchor link, let the default behavior happen after a delay
+                if (link.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    setTimeout(() => {
+                        this.handleAnchorClick(e);
+                    }, 300);
+                }
+            }
+        });
+    });
         // previous button
         if (this.prevBtn) {
             this.prevBtn.addEventListener('click', () => this.prev());
