@@ -1,5 +1,5 @@
 // ============================================
-//  faq HANDLER
+//  FAQ page
 // ============================================
 
 class AccordionFAQ {
@@ -26,7 +26,6 @@ class AccordionFAQ {
                     this.toggleAccordion(item);
                 });
 
-            
                 header.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -40,9 +39,7 @@ class AccordionFAQ {
     toggleAccordion(item) {
         const isActive = item.classList.contains('active');
         
-        
-         this.closeAll();
-        
+        this.closeAll();
         
         if (isActive) {
             this.close(item);
@@ -58,7 +55,6 @@ class AccordionFAQ {
             header.setAttribute('aria-expanded', 'true');
         }
         
-      
         if (typeof gsap !== 'undefined') {
             const content = item.querySelector('.accordion-content');
             gsap.fromTo(content,
@@ -84,21 +80,22 @@ class AccordionFAQ {
 }
 
 // ============================================
-//  CONTACT FORM handler
+//  MODAL CONTACT FORM
 // ============================================
 
-class InlineContactForm {
+class ModalContactForm {
     constructor() {
-      
         const initializeForm = () => {
-            this.form = document.getElementById('contact-form-inline');
+            this.modal = document.getElementById('contact-modal');
+            this.form = document.getElementById('contact-form-modal');
+            this.openButton = document.getElementById('open-contact-modal');
+            this.closeButton = document.getElementById('close-contact-modal');
             
-            if (!this.form) {
-                console.error('[Contact Form] Form element #contact-form-inline not found in DOM');
+            if (!this.modal || !this.form || !this.openButton || !this.closeButton) {
+                console.error('[Modal Form] Required elements not found');
                 return;
             }
             
-           
             this.submitButton = this.form.querySelector('.form-submit');
             this.submitText = this.form.querySelector('.form-submit__text');
             this.submitLoading = this.form.querySelector('.form-submit__loading');
@@ -107,28 +104,15 @@ class InlineContactForm {
             this.messageCounter = document.getElementById('message-counter');
             this.messageField = document.getElementById('message');
             
-        
-            if (!this.submitButton || !this.submitText || !this.submitLoading) {
-                console.error('[Contact Form] Required button elements not found');
+            if (!this.submitButton) {
+                console.error('[Modal Form] Submit button not found');
                 return;
             }
             
-            if (!this.successMessage || !this.failureMessage) {
-                console.error('[Contact Form] Message elements not found');
-                return;
-            }
-            
-            if (!this.messageCounter || !this.messageField) {
-                console.error('[Contact Form] Message field elements not found');
-                return;
-            }
-            
-          
-            console.debug('[Contact Form] All elements found, initializing...');
+            console.debug('[Modal Form] All elements found, initializing...');
             this.init();
         };
 
-       
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeForm);
         } else {
@@ -143,8 +127,72 @@ class InlineContactForm {
     }
 
     attachEvents() {
-        if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      
+        this.openButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openModal();
+        });
+
+       
+        this.closeButton.addEventListener('click', () => {
+            this.closeModal();
+        });
+
+     
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.closeModal();
+            }
+        });
+
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.modal.hidden) {
+                this.closeModal();
+            }
+        });
+
+      
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+    }
+
+    openModal() {
+        this.modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        
+        // reseet form and hide messages
+        this.hideMessages();
+        
+        if (typeof gsap !== 'undefined') {
+            gsap.fromTo(this.modal.querySelector('.modal-content'),
+                { opacity: 0, scale: 0.95, y: 20 },
+                { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+            );
+        }
+
+       
+        setTimeout(() => {
+            const firstInput = this.form.querySelector('input:not([type="hidden"])');
+            if (firstInput) firstInput.focus();
+        }, 300);
+    }
+
+    closeModal() {
+        if (typeof gsap !== 'undefined') {
+            gsap.to(this.modal.querySelector('.modal-content'), {
+                opacity: 0,
+                scale: 0.95,
+                y: 20,
+                duration: 0.2,
+                ease: 'power2.in',
+                onComplete: () => {
+                    this.modal.hidden = true;
+                    document.body.style.overflow = '';
+                }
+            });
+        } else {
+            this.modal.hidden = true;
+            document.body.style.overflow = '';
         }
     }
 
@@ -169,7 +217,7 @@ class InlineContactForm {
     }
 
     // ============================================
-    // REAL-TIME VALIDATION 4 form
+    // REAL-TIME VALIDATION
     // ============================================
 
     setupRealTimeValidation() {
@@ -262,8 +310,10 @@ class InlineContactForm {
     async handleSubmit(e) {
         e.preventDefault();
 
+      
         this.hideMessages();
 
+        // validationns form
         if (!this.validateForm()) {
             this.showError('Please fix the errors above before submitting.');
             return;
@@ -274,10 +324,6 @@ class InlineContactForm {
         try {
             const formData = new FormData(this.form);
             const formAction = this.form.getAttribute('action');
-            
-            if (!formAction || formAction === 'https://formspree.io/f/xjkpreqy') {
-                throw new Error('Formspree form ID not configured.  fix it!!.');
-            }
 
             const response = await fetch(formAction, {
                 method: 'POST',
@@ -293,9 +339,19 @@ class InlineContactForm {
                 if (this.messageCounter) {
                     this.messageCounter.textContent = '0 / 1000 characters';
                 }
+                
+                // close form after 3 seconds
+                setTimeout(() => {
+                    this.closeModal();
+                }, 3000);
             } else {
                 const data = await response.json();
-                throw new Error(data.error || 'Form submission failed');
+                if (data.errors) {
+                    const errorMessages = data.errors.map(err => err.message).join(', ');
+                    throw new Error(errorMessages);
+                } else {
+                    throw new Error('Form submission failed');
+                }
             }
         } catch (error) {
             console.error('Form submission error:', error);
@@ -306,21 +362,23 @@ class InlineContactForm {
     }
 
     setLoadingState(isLoading) {
-        if (!this.submitButton || !this.submitText || !this.submitLoading) return;
+        if (!this.submitButton) return;
         
         if (isLoading) {
             this.submitButton.disabled = true;
-            this.submitText.hidden = true;
-            this.submitLoading.hidden = false;
+            this.submitButton.innerHTML = `
+                <span class="spinner"></span>
+                Sending...
+            `;
         } else {
             this.submitButton.disabled = false;
-            this.submitText.hidden = false;
-            this.submitLoading.hidden = true;
+            this.submitButton.innerHTML = 'Send Message';
         }
     }
 
     showSuccess() {
         if (this.successMessage) {
+            this.successMessage.style.display = 'flex';
             this.successMessage.hidden = false;
             
             if (typeof gsap !== 'undefined') {
@@ -329,11 +387,6 @@ class InlineContactForm {
                     { opacity: 1, y: 0, duration: 0.3 }
                 );
             }
-
-           
-            setTimeout(() => {
-                this.hideMessages();
-            }, 5000); //hide after 5 sec
         }
     }
 
@@ -343,6 +396,7 @@ class InlineContactForm {
             if (errorText) {
                 errorText.textContent = message;
             }
+            this.failureMessage.style.display = 'flex';
             this.failureMessage.hidden = false;
             
             if (typeof gsap !== 'undefined') {
@@ -351,16 +405,16 @@ class InlineContactForm {
                     { opacity: 1, y: 0, duration: 0.3 }
                 );
             }
-            
-            this.failureMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
     hideMessages() {
         if (this.successMessage) {
+            this.successMessage.style.display = 'none';
             this.successMessage.hidden = true;
         }
         if (this.failureMessage) {
+            this.failureMessage.style.display = 'none';
             this.failureMessage.hidden = true;
         }
     }
@@ -394,23 +448,18 @@ function initSmoothScroll() {
     });
 }
 
-// ============================================
-// INITIALIZE ON DOM LOAD
-// ============================================
-
 document.addEventListener('DOMContentLoaded', () => {
     // init accordion
     new AccordionFAQ();
     
-    // init inline contact form
-    new InlineContactForm();
+    // init modal contact form
+    new ModalContactForm();
     
     // init smooth scroll
     initSmoothScroll();
     
-
+    // GSAP animations
     if (typeof gsap !== 'undefined') {
-        // Hero animations
         gsap.fromTo('.contact-hero__left',
             { opacity: 0, y: 30 },
             { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
@@ -428,5 +477,5 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { AccordionFAQ, InlineContactForm };
+    module.exports = { AccordionFAQ, ModalContactForm };
 }

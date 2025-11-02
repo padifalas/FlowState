@@ -12,14 +12,15 @@
     
     <title>Contact - FlowState</title>
     
-    <!-- Stylesheets -->
+ 
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- GSAP -->
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     
-    <!-- Scripts -->
+
     <script src="js/navigation.js" defer></script>
     <script src="js/contact.js" defer></script>
 </head>
@@ -62,7 +63,7 @@
                         </button>
                         <div class="accordion-content">
                             <div class="accordion-answer">
-                                <p>You can reach out through the contact form below, or connect with me directly on social media:</p>
+                                <p>You can reach out through the contact form, or connect with me directly on social media:</p>
                                 <div class="social-links">
                                     <a href="https://github.com/padifalas" target="_blank" rel="noopener noreferrer" class="social-link">
                                         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -139,10 +140,11 @@
                         </div>
                     </div>
 
-                    <!-- Question 5: Send a Message (Contact Form) -->
+                    <!-- Question 5: Send a Message (Button to open modal) -->
                     <div class="accordion-item">
                         <button class="accordion-header" aria-expanded="false">
                             <h2 class="accordion-question">Send me a message</h2>
+                            
                             <span class="accordion-icon">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -152,108 +154,14 @@
                         </button>
                         <div class="accordion-content">
                             <div class="accordion-answer">
-                                <form class="contact-form-inline" id="contact-form-inline" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
-                                    <div class="form-group">
-                                        <label for="name" class="form-label">
-                                            Name <span class="form-required">*</span>
-                                        </label>
-                                        <input 
-                                            type="text" 
-                                            id="name" 
-                                            name="name" 
-                                            class="form-input" 
-                                            required 
-                                            aria-required="true"
-                                            aria-describedby="name-error"
-                                        >
-                                        <span class="form-error" id="name-error" role="alert"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="email" class="form-label">
-                                            Email <span class="form-required">*</span>
-                                        </label>
-                                        <input 
-                                            type="email" 
-                                            id="email" 
-                                            name="email" 
-                                            class="form-input" 
-                                            required 
-                                            aria-required="true"
-                                            aria-describedby="email-error"
-                                        >
-                                        <span class="form-error" id="email-error" role="alert"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="subject" class="form-label">
-                                            Subject <span class="form-required">*</span>
-                                        </label>
-                                        <select 
-                                            id="subject" 
-                                            name="subject" 
-                                            class="form-select" 
-                                            required 
-                                            aria-required="true"
-                                            aria-describedby="subject-error"
-                                        >
-                                            <option value="">Select a subject</option>
-                                            <option value="feedback">General Feedback</option>
-                                            <option value="feature">Feature Request</option>
-                                            <option value="bug">Bug Report</option>
-                                            <option value="collaboration">Collaboration</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <span class="form-error" id="subject-error" role="alert"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="message" class="form-label">
-                                            Message <span class="form-required">*</span>
-                                        </label>
-                                        <textarea 
-                                            id="message" 
-                                            name="message" 
-                                            class="form-textarea" 
-                                            rows="4" 
-                                            required 
-                                            aria-required="true"
-                                            aria-describedby="message-error message-counter"
-                                            maxlength="1000"
-                                        ></textarea>
-                                        <div class="form-meta">
-                                            <span class="form-error" id="message-error" role="alert"></span>
-                                            <span class="form-counter" id="message-counter">0 / 1000 characters</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Honeypot -->
-                                    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
-
-                                    <button type="submit" class="form-submit">
-                                        <span class="form-submit__text">Send Message</span>
-                                        <span class="form-submit__loading" hidden>
-                                            <span class="spinner"></span>
-                                            Sending...
-                                        </span>
-                                    </button>
-
-                                    <div class="form-success" hidden role="status">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        <p>Thank you! Your message has been sent successfully.</p>
-                                    </div>
-
-                                    <div class="form-failure" hidden role="alert">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                        </svg>
-                                        <p>Sorry, something went wrong. Please try again.</p>
-                                    </div>
-                                </form>
+                                <p>Have a question, feedback, or want to collaborate? Click the button below to send me a message.</p>
+                                <button id="open-contact-modal" class="open-modal-button">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Open Contact Form
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -261,6 +169,129 @@
             </div>
         </div>
     </main>
+
+    <!--form -->
+
+<div id="contact-modal" class="modal" hidden role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-header-content">
+                <div class="contact-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2 id="modal-title" class="modal-title">Send me a message</h2>
+                <p class="modal-subtitle">Got ideas, questions, or bugs to squash? Or just wanna say hi? Reach out!</p>
+
+            </div>
+            <button id="close-contact-modal" class="modal-close" aria-label="Close modal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="contact-form-modal" id="contact-form-modal" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
+            <div class="form-group">
+                <label for="name" class="form-label">
+                    Name <span class="form-required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    class="form-input" 
+                    placeholder="Your Name"
+                    required 
+                    aria-required="true"
+                    aria-describedby="name-error"
+                >
+                <span class="form-error" id="name-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    Email <span class="form-required">*</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="youremail@whatever.com"
+                    required 
+                    aria-required="true"
+                    aria-describedby="email-error"
+                >
+                <span class="form-error" id="email-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="subject" class="form-label">
+                    Subject <span class="form-required">*</span>
+                </label>
+                <select 
+                    id="subject" 
+                    name="subject" 
+                    class="form-select" 
+                    required 
+                    aria-required="true"
+                    aria-describedby="subject-error"
+                >
+                    <option value="">Select a subject</option>
+                    <option value="feedback">General Feedback</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="bug">Bug Report</option>
+                    <option value="collaboration">Collaboration</option>
+                    <option value="other">Other</option>
+                </select>
+                <span class="form-error" id="subject-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="message" class="form-label">
+                    Message <span class="form-required">*</span>
+                </label>
+                <textarea 
+                    id="message" 
+                    name="message" 
+                    class="form-textarea" 
+                    rows="4" 
+                    placeholder="type your message here"
+                    required 
+                    aria-required="true"
+                    aria-describedby="message-error message-counter"
+                    maxlength="1000"
+                ></textarea>
+                <div class="form-meta">
+                    <span class="form-error" id="message-error" role="alert"></span>
+                    <span class="form-counter" id="message-counter">0 / 1000 characters</span>
+                </div>
+            </div>
+
+           
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+            <button type="submit" class="form-submit">Send Message</button>
+
+            <div class="form-success" hidden role="status">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <p>Thank you! Your message has been sent successfully.</p>
+            </div>
+
+            <div class="form-failure" hidden role="alert">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>Sorry, something went wrong. Please try again.</p>
+            </div>
+        </form>
+    </div>
+</div>
 
     <footer class="footer">
         <div class="footer__content">

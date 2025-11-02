@@ -1,4 +1,3 @@
-
 /* ============================================
    CONTACT HERO SECTION
    ============================================ */
@@ -9,7 +8,7 @@
     align-items: center;
     justify-content: center;
     padding: calc(80px + var(--space-xl)) var(--container-padding) var(--space-xl);
-    background: var(--color-text-primary)!important ; 
+    background: var(--color-text-primary) !important; 
     position: relative;
 }
 
@@ -22,7 +21,7 @@
     align-items: start;
 }
 
-/* Left Column */
+
 .contact-hero__left {
     position: sticky;
     top: 120px;
@@ -31,7 +30,7 @@
 .contact-hero__title {
     font-family: var(--font-title);
     font-size: clamp(2.5rem, 6vw, 4.5rem);
-    color: var(--color-bg-secondary)!important;
+    color: var(--color-bg-secondary) !important;
     margin-bottom: var(--space-md);
     line-height: 1.1;
     font-weight: 900;
@@ -39,7 +38,7 @@
 
 .contact-hero__description {
     font-size: 1rem;
-    color: var(--color-bg-primary)!important;
+    color: var(--color-bg-primary) !important;
     line-height: 1.7;
     margin-bottom: var(--space-lg);
     max-width: 450px;
@@ -68,7 +67,7 @@
     transform: translateX(4px);
 }
 
-/* Right Column - Accordion */
+/* right Column - Accordion */
 .contact-hero__right {
     background: white;
     border-radius: 20px;
@@ -76,9 +75,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
-/* ============================================
-   ACCORDION FAQ
-   ============================================ */
+
 
 .accordion {
     display: flex;
@@ -181,7 +178,7 @@
 }
 
 /* ============================================
-   SOCIAL LINKS IN ACCORDION
+   SOCIAL LINKS 
    ============================================ */
 
 .social-links {
@@ -217,11 +214,132 @@
 }
 
 /* ============================================
-   CONTACT FORM IN ACCORDION
+   OPEN FORM BUTTON
    ============================================ */
 
-.contact-form-inline {
+.open-modal-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 14px 28px;
+    background: var(--color-accent-red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
     margin-top: var(--space-md);
+}
+
+.open-modal-button:hover {
+    background: #B82E2E;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(217, 53, 53, 0.3);
+}
+
+.open-modal-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+    border-radius: 20px;
+    padding: var(--space-xl);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(217, 53, 53, 0.1);
+}
+
+.modal-header {
+    position: relative;
+    text-align: center;
+    padding-bottom: var(--space-lg);
+    border-bottom: 2px solid rgba(217, 53, 53, 0.1);
+    margin-bottom: var(--space-lg);
+}
+
+.modal-header-content {
+    padding-right: 2rem; 
+}
+
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-bg-secondary);
+    margin: 0;
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-accent-red) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(217, 53, 53, 0.05);
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-bg-primary);
+    transition: all var(--transition-fast);
+    border-radius: 8px;
+}
+
+.modal-close:hover {
+    background: var(--color-accent-red);
+    color: white;
+    border-color: var(--color-accent-red);
+    transform: rotate(90deg);
+}
+
+.modal-close svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ============================================
+   CONTACT FORM IN MODAL
+   ============================================ */
+
+.contact-form-modal {
+    display: flex;
+    flex-direction: column;
 }
 
 .form-group {
@@ -235,9 +353,11 @@
 .form-label {
     display: block;
     color: var(--color-bg-secondary);
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: var(--space-xs);
     font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .form-required {
@@ -249,13 +369,14 @@
 .form-textarea {
     width: 100%;
     padding: 12px 16px;
-    background: #F8F8F8;
-    border: 2px solid transparent;
+    background: white;
+    border: 2px solid #E5E5E5;
     border-radius: 8px;
     color: var(--color-bg-secondary);
     font-size: 1rem;
     font-family: inherit;
     transition: all var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .form-input:focus,
@@ -264,6 +385,8 @@
     outline: none;
     border-color: var(--color-accent-red);
     background: white;
+    box-shadow: 0 4px 12px rgba(217, 53, 53, 0.15);
+    transform: translateY(-1px);
 }
 
 .form-input.error,
@@ -310,22 +433,25 @@
 
 .form-submit {
     width: 100%;
-    padding: 14px 28px;
-    background: var(--color-accent-red);
+    padding: 16px 28px;
+    background: linear-gradient(135deg, var(--color-accent-red) 0%, #B82E2E 100%);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all var(--transition-base);
     margin-top: var(--space-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(217, 53, 53, 0.3);
 }
 
 .form-submit:hover:not(:disabled) {
-    background: #B82E2E;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 53, 53, 0.3);
+    background: linear-gradient(135deg, #B82E2E 0%, var(--color-accent-red) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(217, 53, 53, 0.4);
 }
 
 .form-submit:disabled {
@@ -387,6 +513,37 @@
 .form-success svg,
 .form-failure svg {
     flex-shrink: 0;
+}
+
+.contact-icon {
+    width: 5rem; 
+    height: 5rem;
+    background: linear-gradient(135deg, var(--color-accent-red) 0%, #B82E2E 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(217, 53, 53, 0.3);
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+
+.contact-icon i {
+    font-size: 2rem;
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(217, 53, 53, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 32px rgba(217, 53, 53, 0.4);
+    }
 }
 
 /* ============================================
@@ -454,6 +611,14 @@
         width: 100%;
         justify-content: center;
     }
+
+    .modal-content {
+        padding: var(--space-lg);
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -479,50 +644,25 @@
     .form-textarea {
         font-size: 16px; 
     }
+
+    .modal-content {
+        padding: var(--space-md);
+        border-radius: 16px;
+    }
+
+    .modal-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color:black !important;
+    line-height: 1.6;
+    max-width: 450px;
+    margin: 0 auto;
 }
 
-/* ============================================
-   dark mode - might implement
-   ============================================ */
-
-/* @media (prefers-color-scheme: dark) {
-    .contact-hero {
-        background: var(--color-bg-secondary);
+    .modal-title {
+        font-size: 1.25rem;
     }
-    
-    .contact-hero__title {
-        color: var(--color-text-primary);
-    }
-    
-    .contact-hero__description {
-        color: var(--color-text-secondary);
-    }
-    
-    .contact-hero__right {
-        background: var(--color-bg-tertiary);
-    }
-    
-    .accordion-question {
-        color: var(--color-text-primary);
-    }
-    
-    .accordion-answer {
-        color: var(--color-text-secondary);
-    }
-    
-    .form-input,
-    .form-select,
-    .form-textarea {
-        background: var(--color-bg-secondary);
-        color: var(--color-text-primary);
-    }
-    
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
-        background: var(--color-bg-primary);
-    }
-} */
+}
 
 /* ============================================
    ANIMATIONS
@@ -556,5 +696,3 @@
 .accordion-item:nth-child(3) { animation-delay: 0.6s; }
 .accordion-item:nth-child(4) { animation-delay: 0.7s; }
 .accordion-item:nth-child(5) { animation-delay: 0.8s; }
-
-
