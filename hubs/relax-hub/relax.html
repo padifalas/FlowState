@@ -41,6 +41,8 @@
     <script src="../../js/navigation.js" defer></script>
     <script src="../../js/hub-controller.js"></script>
     <script src="../../js/side-nav-controller.js" defer></script>
+
+    <script src="../../js/timer.js" defer></script>
 </head>
 <body class="hub-page" data-hub="relax">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -54,31 +56,31 @@
             <h2 class="visually-hidden">Navigate to Other Hubs</h2>
             <ul class="side-nav__list">
                 <li class="side-nav__item">
-                    <a href="focus.html" class="side-nav__link">
+                    <a href="../focus-hub/focus.html" class="side-nav__link">
                         <span class="side-nav__icon" aria-hidden="true">⬢</span>
                         <span class="side-nav__text">Focus</span>
                     </a>
                 </li>
                 <li class="side-nav__item side-nav__item--active">
-                    <a href="relax.html" class="side-nav__link" aria-current="page">
+                    <a href="../relax-hub/relax.html" class="side-nav__link" aria-current="page">
                         <span class="side-nav__icon" aria-hidden="true">◯</span>
                         <span class="side-nav__text">Relax</span>
                     </a>
                 </li>
                 <li class="side-nav__item">
-                    <a href="energize.html" class="side-nav__link">
+                    <a href="../energize-hub/energize.html" class="side-nav__link">
                         <span class="side-nav__icon" aria-hidden="true">▲</span>
                         <span class="side-nav__text">Energize</span>
                     </a>
                 </li>
                 <li class="side-nav__item">
-                    <a href="creative.html" class="side-nav__link">
+                    <a href="../creative-hub/creative.html" class="side-nav__link">
                         <span class="side-nav__icon" aria-hidden="true">✦</span>
                         <span class="side-nav__text">Creative</span>
                     </a>
                 </li>
                 <li class="side-nav__item">
-                    <a href="melancholy.html" class="side-nav__link">
+                    <a href="../melancholy-hub/melancholy.html" class="side-nav__link">
                         <span class="side-nav__icon" aria-hidden="true">◇</span>
                         <span class="side-nav__text">Melancholy</span>
                     </a>
@@ -89,7 +91,7 @@
 
     <nav id="main-navigation" aria-label="Main navigation"></nav>
 
-    <aside class="timer-widget" aria-label="Pomodoro timer">
+    <!-- <aside class="timer-widget" aria-label="Pomodoro timer">
         <div class="timer-widget__container">
             <svg class="timer-widget__progress" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
                 <circle class="timer-widget__progress-bg" cx="60" cy="60" r="54" />
@@ -123,18 +125,212 @@
                 </button>
             </div>
         </div>
-    </aside>
+    </aside> -->
 
     <main id="main-content">
-        <section class="hub-hero" aria-labelledby="hub-title">
-            <div class="hub-hero__content">
-                <h1 id="hub-title" class="hub-hero__title">RELAX HUB</h1>
-                <p class="hub-hero__description">
-                    Unwind with calming music, meditation guides, and peaceful content designed to restore your energy and reduce stress. Perfect for mindful breaks and stress relief.
-                </p>
+<section class="hub-hero" aria-labelledby="hub-title">
+    <div class="hub-hero__content">
+        <h1 id="hub-title" class="hub-hero__title">RELAX HUB</h1>
+        <p class="hub-hero__description">
+            Unwind with calming music, meditation guides, and peaceful content designed to restore your energy and reduce stress.
+        </p>
+    </div>
+    <!-- Pomodoro Timer Integration -->
+    <div class="timer-hero">
+        <!-- Mode Switcher -->
+        <div class="timer-hero__modes" role="tablist" aria-label="Timer modes">
+            <button 
+                class="timer-hero__mode-btn active" 
+                data-timer-mode="pomodoro"
+                role="tab"
+                aria-selected="true"
+                aria-controls="timer-display">
+                pomodoro
+            </button>
+            <button 
+                class="timer-hero__mode-btn" 
+                data-timer-mode="shortBreak"
+                role="tab"
+                aria-selected="false"
+                aria-controls="timer-display">
+                short break
+            </button>
+            <button 
+                class="timer-hero__mode-btn" 
+                data-timer-mode="longBreak"
+                role="tab"
+                aria-selected="false"
+                aria-controls="timer-display">
+                long break
+            </button>
+        </div>
+        
+        <!-- Timer Display -->
+        <div class="timer-hero__display" id="timer-display" role="tabpanel">
+            <svg class="timer-hero__circle" viewBox="0 0 400 400" aria-hidden="true">
+                <circle class="timer-hero__progress-bg" cx="200" cy="200" r="180" />
+                <circle class="timer-hero__progress-fill" cx="200" cy="200" r="180" />
+            </svg>
+            
+            <div class="timer-hero__time" aria-live="polite" aria-atomic="true">25:00</div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="timer-hero__controls">
+            <button class="timer-hero__btn timer-hero__play" aria-label="Start timer">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </button>
+            
+            <button class="timer-hero__btn timer-hero__pause hidden" aria-label="Pause timer">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+            
+            <button class="timer-hero__btn timer-hero__reset" aria-label="Reset timer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+            </button>
+            
+            <button class="timer-hero__btn timer-hero__settings" aria-label="Timer settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="timer-settings-modal" role="dialog" aria-labelledby="settings-title" aria-modal="true">
+    <div class="timer-settings-modal__content">
+        <div class="timer-settings-modal__header">
+            <h2 id="settings-title" class="timer-settings-modal__title">Timer Settings</h2>
+            <button class="timer-settings-modal__close" aria-label="Close settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="timer-settings-form">
+            <!-- Time Settings -->
+            <div class="timer-settings__section">
+                <h3 class="timer-settings__section-title">Time (minutes)</h3>
+                
+                <div class="timer-settings__field">
+                    <label for="setting-pomodoro" class="timer-settings__label">Pomodoro</label>
+                    <input 
+                        type="number" 
+                        id="setting-pomodoro" 
+                        name="pomodoro" 
+                        min="1" 
+                        max="60" 
+                        value="25"
+                        class="timer-settings__input"
+                        aria-describedby="pomodoro-desc">
+                </div>
+                <span id="pomodoro-desc" class="visually-hidden">Duration of work session in minutes</span>
+                
+                <div class="timer-settings__field">
+                    <label for="setting-short-break" class="timer-settings__label">Short Break</label>
+                    <input 
+                        type="number" 
+                        id="setting-short-break" 
+                        name="shortBreak" 
+                        min="1" 
+                        max="30" 
+                        value="5"
+                        class="timer-settings__input"
+                        aria-describedby="short-break-desc">
+                </div>
+                <span id="short-break-desc" class="visually-hidden">Duration of short break in minutes</span>
+                
+                <div class="timer-settings__field">
+                    <label for="setting-long-break" class="timer-settings__label">Long Break</label>
+                    <input 
+                        type="number" 
+                        id="setting-long-break" 
+                        name="longBreak" 
+                        min="1" 
+                        max="60" 
+                        value="15"
+                        class="timer-settings__input"
+                        aria-describedby="long-break-desc">
+                </div>
+                <span id="long-break-desc" class="visually-hidden">Duration of long break in minutes</span>
             </div>
-            <div class="hub-hero__atmosphere" aria-hidden="true"></div>
-        </section>
+            
+            <!-- Auto-start Settings -->
+            <div class="timer-settings__section">
+                <h3 class="timer-settings__section-title">Auto-start</h3>
+                
+                <div class="timer-settings__field">
+                    <label class="timer-settings__checkbox">
+                        <input 
+                            type="checkbox" 
+                            id="setting-auto-breaks" 
+                            name="autoStartBreaks"
+                            aria-describedby="auto-breaks-desc">
+                        <span class="timer-settings__label">Auto-start Breaks</span>
+                    </label>
+                </div>
+                <span id="auto-breaks-desc" class="visually-hidden">Automatically start break timer after work session</span>
+                
+                <div class="timer-settings__field">
+                    <label class="timer-settings__checkbox">
+                        <input 
+                            type="checkbox" 
+                            id="setting-auto-pomodoros" 
+                            name="autoStartPomodoros"
+                            aria-describedby="auto-pomodoros-desc">
+                        <span class="timer-settings__label">Auto-start Pomodoros</span>
+                    </label>
+                </div>
+                <span id="auto-pomodoros-desc" class="visually-hidden">Automatically start work session after break</span>
+            </div>
+            
+            <!-- Long Break Interval -->
+            <div class="timer-settings__section">
+                <h3 class="timer-settings__section-title">Long Break Interval</h3>
+                
+                <div class="timer-settings__field">
+                    <label for="setting-long-break-interval" class="timer-settings__label">
+                        After how many pomodoros?
+                    </label>
+                    <input 
+                        type="number" 
+                        id="setting-long-break-interval" 
+                        name="longBreakInterval" 
+                        min="1" 
+                        max="10" 
+                        value="4"
+                        class="timer-settings__input"
+                        aria-describedby="interval-desc">
+                </div>
+                <span id="interval-desc" class="visually-hidden">Number of work sessions before long break</span>
+            </div>
+            
+            <!-- Actions -->
+            <div class="timer-settings__actions">
+                <button type="button" class="timer-settings__btn timer-settings__btn--secondary timer-settings-modal__close">
+                    Cancel
+                </button>
+                <button type="submit" class="timer-settings__btn timer-settings__btn--primary">
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+    
+    <div class="hub-hero__atmosphere" aria-hidden="true"></div>
+</section>
 
         <nav class="filter-nav" aria-label="Content filter">
             <ul class="filter-nav__list">
