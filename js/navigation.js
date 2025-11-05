@@ -24,100 +24,76 @@ class Navigation {
     }
 
     /**
-     * Detect which level we're at based on folder structure
-     * Returns: 'root', 'hubs', or 'nested-hubs'
+     * detec which level we're at based on folder structure
+     * returnsns: 'root', 'hubs', or 'nested-hubs'
      */
     detectPageLevel() {
         const path = window.location.pathname;
+        const url = window.location.href;
         
         console.log('[Navigation] Full pathname:', path);
+        console.log('[Navigation] Full URL:', url);
         
-        // Clean the path
-        let cleanPath = path.replace(/^\//, '').replace(/^[A-Za-z]:\//, '');
-        const segments = cleanPath.split(/[/\\]/).filter(Boolean);
+        // check if we're in a hub folder
+        const isInHubFolder = path.includes('/hubs/') || 
+                             path.includes('\\hubs\\') ||
+                             url.includes('/hubs/');
         
-        // Remove filename
-        if (segments.length > 0 && segments[segments.length - 1].includes('.')) {
-            segments.pop();
-        }
-        
-        const depth = segments.length;
-        
-        // Check if we're in a hub page
-        if (path.includes('/hubs/') || path.includes('\\hubs\\')) {
-            if (depth >= 2) {
-                console.log('[Navigation] Detected: nested hub folder (depth:', depth + ')');
-                return 'nested-hubs';
+        if (isInHubFolder) {
+           
+            const hubPath = path.split('/hubs/')[1] || path.split('\\hubs\\')[1];
+            if (hubPath) {
+                const depth = hubPath.split(/[/\\]/).filter(Boolean).length;
+                console.log('[Navigation] Hub folder depth:', depth);
+                
+                if (depth >= 2) {
+                    console.log('[Navigation] Detected: nested hub folder');
+                    return 'nested-hubs';
+                }
             }
-            console.log('[Navigation] Detected: hub folder (depth:', depth + ')');
+            console.log('[Navigation] Detected: hub folder');
             return 'hubs';
         }
         
-        // Also check if the current file is a known hub page
-        const filename = path.split(/[/\\]/).pop() || '';
-        const hubFiles = ['focus.html', 'relax.html', 'energize.html', 'creative.html', 'melancholy.html',
-                          'focus-hub.html', 'relax-hub.html', 'energize-hub.html', 'creative-hub.html', 'melancholy-hub.html'];
+        // will chec if we're at root level but accessing a hub file directly
+        const filename = path.split('/').pop() || '';
+        const hubFiles = [
+            'focus.html', 'relax.html', 'energize.html', 'creative.html', 'melancholy.html',
+            'focus-hub.html', 'relax-hub.html', 'energize-hub.html', 'creative-hub.html', 'melancholy-hub.html'
+        ];
         
         if (hubFiles.includes(filename)) {
-            console.log('[Navigation] Detected: hub file by filename:', filename, '(depth:', depth + ')');
-            return depth >= 2 ? 'nested-hubs' : 'hubs';
+            console.log('[Navigation] Detected: hub file at root level');
+            return 'hubs';
         }
         
         console.log('[Navigation] Detected: at root level');
         return 'root';
     }
 
-    /**
-     * Get the correct relative prefix based on page level
-     * Counts actual directory depth from the project root
-     */
+
     getRelativePrefix() {
-        const path = window.location.pathname;
+        const pageLevel = this.detectPageLevel();
         
-        // For file:// protocol, we need to find where "FlowState" is
-        let projectRootIndex = -1;
-        const projectName = 'FlowState';
+        console.log('[Navigation] Page level for prefix:', pageLevel);
         
-        // Find the project root in the path
-        const pathLower = path.toLowerCase();
-        projectRootIndex = pathLower.indexOf(projectName.toLowerCase());
-        
-        let relevantPath = path;
-        if (projectRootIndex !== -1) {
-            // Extract only the path after the project root
-            relevantPath = path.substring(projectRootIndex + projectName.length);
+        switch (pageLevel) {
+            case 'nested-hubs':
+               
+                return '../../';
+            case 'hubs':
+               
+                return '../';
+            case 'root':
+            default:
+                return '';
         }
-        
-        console.log('[Navigation] Relevant path:', relevantPath);
-        
-        // Split by both forward and backward slashes
-        const segments = relevantPath.split(/[/\\]/).filter(seg => seg && seg !== '');
-        
-        // Remove the filename (last segment)
-        if (segments.length > 0 && segments[segments.length - 1].includes('.')) {
-            segments.pop();
-        }
-        
-        // Count how many directories deep we are from project root
-        const depth = segments.length;
-        
-        console.log('[Navigation] Path segments:', segments);
-        console.log('[Navigation] Directory depth:', depth);
-        
-        // Generate the correct number of ../
-        const prefix = depth > 0 ? '../'.repeat(depth) : '';
-        
-        console.log('[Navigation] Calculated prefix:', prefix || '(none - at root)');
-        
-        return prefix;
     }
 
-    /**
-     * Determine if we're on the homepage
-     */
+
     isHomepage() {
         const filename = window.location.pathname.split('/').pop() || '';
-        return filename === '' || filename === 'index.html' || filename === '/';
+        return filename === '' || filename === 'index.html' || filename === '/' || filename === 'index';
     }
 
     init() {
@@ -132,42 +108,55 @@ class Navigation {
         const relPrefix = this.getRelativePrefix();
         const pageLevel = this.detectPageLevel();
         
+        console.log('[Navigation] Final calculation:');
         console.log('[Navigation] Page Level:', pageLevel);
         console.log('[Navigation] Is Homepage?', isHomepage);
         console.log('[Navigation] Relative Prefix:', relPrefix || '(none - at root)');
 
-        // Build paths for logo
-        const logoHref = relPrefix ? `${relPrefix}index.html` : 'index.html';
-        const logoSrc = relPrefix ? `${relPrefix}assets/logo.svg` : 'assets/logo.svg';
-
-        // Build navigation links based on current page level
+       
         let navLinks;
         
         if (isHomepage) {
-            // On homepage - use anchor links for same-page sections
+         
             navLinks = [
                 { name: 'Home', href: '#home', id: 'home', isAnchor: true },
                 { name: 'About', href: '#about', id: 'about', isAnchor: true },
                 { name: 'Hubs', href: '#mood-hubs', id: 'hubs', isAnchor: true },
                 { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
             ];
-        } else if (pageLevel === 'hubs') {
-            // In hubs folder - go up one level
-            navLinks = [
-                { name: 'Home', href: '../index.html', id: 'home', isAnchor: false },
-                { name: 'About', href: '../index.html#about', id: 'about', isAnchor: false },
-                { name: 'Hubs', href: '../index.html#mood-hubs', id: 'hubs', isAnchor: false },
-                { name: 'Contact', href: '../contact.html', id: 'contact', isAnchor: false }
-            ];
         } else {
-            // At root level (e.g., contact.html)
+            
             navLinks = [
-                { name: 'Home', href: 'index.html', id: 'home', isAnchor: false },
-                { name: 'About', href: 'index.html#about', id: 'about', isAnchor: false },
-                { name: 'Hubs', href: 'index.html#mood-hubs', id: 'hubs', isAnchor: false },
-                { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
+                { 
+                    name: 'Home', 
+                    href: relPrefix ? `${relPrefix}index.html` : 'index.html', 
+                    id: 'home', 
+                    isAnchor: false 
+                },
+                { 
+                    name: 'About', 
+                    href: relPrefix ? `${relPrefix}index.html#about` : 'index.html#about', 
+                    id: 'about', 
+                    isAnchor: false 
+                },
+                { 
+                    name: 'Hubs', 
+                    href: relPrefix ? `${relPrefix}index.html#mood-hubs` : 'index.html#mood-hubs', 
+                    id: 'hubs', 
+                    isAnchor: false 
+                },
+                { 
+                    name: 'Contact', 
+                    href: relPrefix ? `${relPrefix}contact.html` : 'contact.html', 
+                    id: 'contact', 
+                    isAnchor: false 
+                }
             ];
         }
+
+      
+        const logoHref = relPrefix ? `${relPrefix}index.html` : 'index.html';
+        const logoSrc = relPrefix ? `${relPrefix}assets/logo.svg` : 'assets/logo.svg';
 
         const navHTML = `
             <div class="nav-container">
@@ -210,27 +199,25 @@ class Navigation {
 
         this.navElement.innerHTML = navHTML;
         
-        // Log all generated links for debugging
-        console.log('[Navigation] Generated links:', navLinks.map(l => `${l.name}: ${l.href}`));
+        
+        console.log('[Navigation] generatedd links:', navLinks.map(l => `${l.name}: ${l.href}`));
     }
 
-    /**
-     * Determine if a link should be marked as active
-     */
+ 
     isLinkActive(linkId) {
         const currentPage = this.currentPage;
         
-        // Homepage
+        // home
         if (linkId === 'home' && (currentPage === 'index' || currentPage === '')) {
             return true;
         }
         
-        // Contact page
+        // conta page
         if (linkId === 'contact' && currentPage === 'contact') {
             return true;
         }
         
-        // Hub pages - check for both naming conventions
+        // hubb pages - check for both naming conventions
         const hubPages = [
             'creative-hub', 'energize-hub', 'focus-hub', 'melancholy-hub', 'relax-hub',
             'creative', 'energize', 'focus', 'melancholy', 'relax'
@@ -249,7 +236,7 @@ class Navigation {
             link.addEventListener('mouseenter', this.handleLinkHover);
             link.addEventListener('mouseleave', this.handleLinkLeave);
 
-            // Handle clicks
+           
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
                 const isAnchor = link.getAttribute('data-is-anchor') === 'true';
@@ -258,7 +245,7 @@ class Navigation {
 
                 console.log('[Navigation] Link clicked:', href, 'Is anchor?', isAnchor);
 
-                // If mobile menu is open, close it first
+             
                 if (isMobileMenuOpen) {
                     e.preventDefault();
                     this.closeMobileMenu();
@@ -272,15 +259,15 @@ class Navigation {
                         }
                     }, 300);
                 } else if (isAnchor) {
-                    // Handle anchor links on desktop
+                   
                     e.preventDefault();
                     this.scrollToAnchor(href);
                 }
-                // Let normal navigation happen for non-anchor links
+                
             });
         });
 
-        // Mobile menu toggle
+      
         const toggle = this.navElement.querySelector('.nav-toggle');
         if (toggle) {
             toggle.addEventListener('click', (e) => {
@@ -289,7 +276,7 @@ class Navigation {
             });
         }
 
-        // Close mobile menu on resize
+       
         window.addEventListener('resize', () => {
             const mobileList = this.navElement.querySelector('.nav-links');
             if (mobileList && mobileList.classList.contains('open')) {
@@ -298,9 +285,7 @@ class Navigation {
         });
     }
 
-    /**
-     * Smooth scroll to anchor on the page
-     */
+
     scrollToAnchor(href) {
         const targetId = href.includes('#') ? href.split('#')[1] : href.substring(1);
         const targetElement = document.getElementById(targetId);
@@ -334,7 +319,7 @@ class Navigation {
         const mobileList = this.navElement.querySelector('.nav-links');
         if (!mobileList) return;
 
-        // Create overlay
+     
         let overlay = document.getElementById('nav-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -352,24 +337,24 @@ class Navigation {
             if (firstLink) firstLink.focus();
         }
 
-        // Prevent background scroll
+     
         document.body.style.overflow = 'hidden';
         document.body.classList.add('menu-open');
 
-        // Stagger animation
+       
         const items = Array.from(mobileList.querySelectorAll('.nav-item'));
         items.forEach((it, i) => {
             const delay = i * 45;
             it.style.transitionDelay = `${delay}ms`;
         });
 
-        // Overlay click handler
+       
         overlay.addEventListener('click', this._overlayClickHandler = (e) => {
             e.preventDefault();
             this.closeMobileMenu();
         });
 
-        // Keyboard handler
+       
         this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
         document.addEventListener('keydown', this._mobileKeydownHandler);
     }
@@ -386,7 +371,7 @@ class Navigation {
             toggle.focus();
         }
 
-        // Remove overlay
+     
         const overlay = document.getElementById('nav-overlay');
         if (overlay) {
             overlay.classList.remove('is-visible');
@@ -397,15 +382,15 @@ class Navigation {
             this._overlayClickHandler = null;
         }
 
-        // Restore background scroll
+       
         document.body.style.overflow = '';
         document.body.classList.remove('menu-open');
 
-        // Clear stagger delays
+        
         const items = mobileList.querySelectorAll('.nav-item');
         items.forEach(it => { it.style.transitionDelay = ''; });
 
-        // Remove keyboard handler
+      
         if (this._mobileKeydownHandler) {
             document.removeEventListener('keydown', this._mobileKeydownHandler);
             this._mobileKeydownHandler = null;
@@ -521,17 +506,17 @@ class MoodHubsCarousel {
     }
 
     attachEvents() {
-        // Previous button
+        // prev button
         if (this.prevBtn) {
             this.prevBtn.addEventListener('click', () => this.prev());
         }
 
-        // Next button
+        // next btn
         if (this.nextBtn) {
             this.nextBtn.addEventListener('click', () => this.next());
         }
 
-        // Dots navigation
+     
         if (this.dotsContainer) {
             this.dotsContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('carousel-dot')) {
@@ -541,7 +526,7 @@ class MoodHubsCarousel {
             });
         }
 
-        // Keyboard navigation
+        
         this.track.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
                 this.prev();
@@ -550,7 +535,7 @@ class MoodHubsCarousel {
             }
         });
 
-        // Touch support
+      
         this.addSwipeSupport();
     }
 
@@ -630,7 +615,7 @@ class MoodHubsCarousel {
     updateButtons() {
         if (!this.prevBtn || !this.nextBtn) return;
 
-        // Previous button
+        
         if (this.currentIndex === 0) {
             this.prevBtn.disabled = true;
             this.prevBtn.style.opacity = '0';
@@ -641,7 +626,7 @@ class MoodHubsCarousel {
             this.prevBtn.style.pointerEvents = 'auto';
         }
 
-        // Next button
+       
         if (this.currentIndex >= this.totalSlides - 1) {
             this.nextBtn.disabled = true;
             this.nextBtn.style.opacity = '0';
@@ -675,7 +660,7 @@ class MoodHubsCarousel {
             this.cardsPerView = newCardsPerView;
             this.totalSlides = Math.ceil(this.cards.length / this.cardsPerView);
             
-            // Reset to first slide if current index is out of bounds
+            
             if (this.currentIndex >= this.totalSlides) {
                 this.currentIndex = this.totalSlides - 1;
             }
@@ -689,14 +674,14 @@ class MoodHubsCarousel {
 }
 
 // ============================================
-// INITIALIZE ON DOM LOAD
+// INITT ON DOM LOAD
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Navigation
+    // init Navigation
     new Navigation();
     
-    // Initialize Carousel (only if on homepage)
+  
     if (document.getElementById('mood-hubs-track')) {
         new MoodHubsCarousel();
     }
