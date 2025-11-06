@@ -2,11 +2,16 @@
 //  FAQ page
 // ============================================
 
+if (typeof gsap !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+}
+
 class AccordionFAQ {
     constructor() {
         this.accordionItems = document.querySelectorAll('.accordion-item');
         this.init();
     }
+    
 
     init() {
         if (!this.accordionItems.length) {
