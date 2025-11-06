@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="../../css/movie-modal.css">
     <link rel="stylesheet" href="../../css/music-cards.css">
     <link rel="stylesheet" href="../../css/game-carousel.css">
+    <link rel="stylesheet" href="../../css/timer.css">
     
     <!-- GSAP Animation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
@@ -44,6 +45,7 @@
     <script src="../../js/navigation.js" defer></script>
     <script src="../../js/hub-controller.js"></script>
     <script src="../../js/side-nav-controller.js" defer></script>
+    <script src="../../js/timer.js"></script>
 </head>
 <body class="hub-page" data-hub="focus">
   
@@ -97,43 +99,6 @@
         <!-- Navigation will be injected by navigation.js -->
     </nav>
 
-    <!-- Pomodoro Timer Widget -->
-    <aside class="timer-widget" aria-label="Pomodoro timer">
-        <div class="timer-widget__container">
-            <svg class="timer-widget__progress" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
-                <circle class="timer-widget__progress-bg" cx="60" cy="60" r="54" />
-                <circle class="timer-widget__progress-fill" cx="60" cy="60" r="54" />
-            </svg>
-            
-            <div class="timer-widget__content">
-                <div class="timer-widget__display" aria-live="polite" aria-atomic="true">
-                    <span class="timer-widget__time">25:00</span>
-                </div>
-                <div class="timer-widget__status">Work Session</div>
-            </div>
-            
-            <div class="timer-widget__controls">
-                <button class="timer-widget__btn timer-widget__btn--start" aria-label="Start timer">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                </button>
-                <button class="timer-widget__btn timer-widget__btn--pause" aria-label="Pause timer" hidden>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <rect x="6" y="4" width="4" height="16"></rect>
-                        <rect x="14" y="4" width="4" height="16"></rect>
-                    </svg>
-                </button>
-                <button class="timer-widget__btn timer-widget__btn--reset" aria-label="Reset timer">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <polyline points="1 4 1 10 7 10"></polyline>
-                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </aside>
-
     <!-- Main Content -->
     <main id="main-content">
         <!-- Hero Section -->
@@ -143,9 +108,114 @@
                 <p class="hub-hero__description">
                     Deep concentration mode with ambient music, productivity tools, and distraction-free content to help you achieve flow state. Perfect for deep work sessions and intense focus periods.
                 </p>
+
+                 <!-- Timer Section -->
+                <div class="timer-hero">
+                    <div class="timer-hero__display">
+                        <svg class="timer-hero__progress" width="300" height="300" viewBox="0 0 300 300" aria-hidden="true">
+                            <circle class="timer-hero__progress-bg" cx="150" cy="150" r="135" />
+                            <circle class="timer-hero__progress-fill" cx="150" cy="150" r="135" />
+                        </svg>
+                        
+                        <div class="timer-hero__time" aria-live="polite" aria-atomic="true">25:00</div>
+                        <div class="timer-hero__status">Work Session</div>
+                    </div>
+                    
+                    <div class="timer-hero__mode-selector">
+                        <button class="timer-hero__mode-btn active" data-timer-mode="pomodoro" aria-pressed="true">Pomodoro</button>
+                        <button class="timer-hero__mode-btn" data-timer-mode="shortBreak" aria-pressed="false">Short Break</button>
+                        <button class="timer-hero__mode-btn" data-timer-mode="longBreak" aria-pressed="false">Long Break</button>
+                    </div>
+                    
+                    <div class="timer-hero__controls">
+                        <button class="timer-hero__btn timer-hero__btn--start" aria-label="Start timer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Start
+                        </button>
+                        <button class="timer-hero__btn timer-hero__btn--pause hidden" aria-label="Pause timer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                            Pause
+                        </button>
+                        <button class="timer-hero__btn timer-hero__btn--reset" aria-label="Reset timer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                            </svg>
+                            Reset
+                        </button>
+                        <button class="timer-hero__btn timer-hero__btn--settings" aria-label="Open timer settings">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Settings
+                        </button>
+                    </div>
+                </div>
             </div>
+            
+    <!-- Settings Modal -->
+    <div class="timer-settings-modal" role="dialog" aria-labelledby="settings-title" aria-hidden="true">
+        <div class="timer-settings-modal__content">
+            <div class="timer-settings-modal__header">
+                <h2 id="settings-title" class="timer-settings-modal__title">Timer Settings</h2>
+                <button class="timer-settings-modal__close" aria-label="Close settings">×</button>
+            </div>
+            
+            <form class="timer-settings-form">
+                <div class="timer-settings-form__group">
+                    <label for="setting-pomodoro" class="timer-settings-form__label">Pomodoro (minutes)</label>
+                    <input type="number" id="setting-pomodoro" name="pomodoro" min="1" max="60" class="timer-settings-form__input" required>
+                </div>
+                
+                <div class="timer-settings-form__group">
+                    <label for="setting-short-break" class="timer-settings-form__label">Short Break (minutes)</label>
+                    <input type="number" id="setting-short-break" name="shortBreak" min="1" max="30" class="timer-settings-form__input" required>
+                </div>
+                
+                <div class="timer-settings-form__group">
+                    <label for="setting-long-break" class="timer-settings-form__label">Long Break (minutes)</label>
+                    <input type="number" id="setting-long-break" name="longBreak" min="1" max="60" class="timer-settings-form__input" required>
+                </div>
+                
+                <div class="timer-settings-form__group">
+                    <label for="setting-long-break-interval" class="timer-settings-form__label">Long Break Interval</label>
+                    <input type="number" id="setting-long-break-interval" name="longBreakInterval" min="1" max="10" class="timer-settings-form__input" required>
+                </div>
+                
+                <div class="timer-settings-form__group">
+                    <div class="timer-settings-form__checkbox-group">
+                        <input type="checkbox" id="setting-auto-breaks" name="autoStartBreaks" class="timer-settings-form__checkbox">
+                        <label for="setting-auto-breaks" class="timer-settings-form__label">Auto Start Breaks</label>
+                    </div>
+                    
+                    <div class="timer-settings-form__checkbox-group">
+                        <input type="checkbox" id="setting-auto-pomodoros" name="autoStartPomodoros" class="timer-settings-form__checkbox">
+                        <label for="setting-auto-pomodoros" class="timer-settings-form__label">Auto Start Pomodoros</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="timer-settings-form__submit">Save Settings</button>
+            </form>
+        </div>
+    </div>
+
+            <div class="hub-hero__atmosphere" aria-hidden="true"></div>
+
+           
             <div class="hub-hero__atmosphere" aria-hidden="true"></div>
         </section>
+
+        </section>
+
+  
+
+        
 
         <!-- Filter Navigation -->
         <nav class="filter-nav" aria-label="Content filter">
