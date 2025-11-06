@@ -1,10 +1,13 @@
 // ============================================
-// MUSIC UI RENDERER
+// MUSIC CAROUSEL RENDERER
 // ============================================
 
 class MusicRenderer {
     constructor() {
         this.container = null;
+        this.currentIndex = 0;
+        this.itemsPerView = 4;
+        this.items = [];
     }
 
     // ============================================
@@ -25,29 +28,79 @@ class MusicRenderer {
             return;
         }
 
+        this.items = items;
+        this.currentIndex = 0;
+
         // clearing existing content
         this.container.innerHTML = '';
 
-        // If no items, show empty state
+        // if the ar no items, show empty state
         if (!items || items.length === 0) {
             this.renderEmptyState();
             return;
         }
 
-        // creates and append cards
-        items.forEach((item, index) => {
-            const card = this.createMusicCard(item, index);
-            this.container.appendChild(card);
-        });
+        //  carousel structure
+        const carousel = this.createCarousel(items);
+        this.container.appendChild(carousel);
 
-        // trigeer stagger animation [will add GSAP animations later]
+      
+        this.attachCarouselEvents();
+
+        //  stagger animation - NEED TO FIXXXX DAMN
         if (typeof gsap !== 'undefined') {
-            this.animateCards();
+            this.animateCarouselIn();
         }
     }
 
     // ============================================
-    // CREATE MUSIC CARD
+    // CREATE CAROUSEL
+    // ============================================
+
+    createCarousel(items) {
+        const carousel = document.createElement('div');
+        carousel.className = 'music-carousel';
+
+        // prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'music-carousel__nav music-carousel__nav--prev';
+        prevBtn.setAttribute('aria-label', 'Previous music items');
+        prevBtn.disabled = true;
+        prevBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        `;
+
+        // next btn
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'music-carousel__nav music-carousel__nav--next';
+        nextBtn.setAttribute('aria-label', 'Next music items');
+        nextBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        `;
+
+       
+        const wrapper = document.createElement('div');
+        wrapper.className = 'music-carousel__wrapper';
+
+       
+        items.forEach((item, index) => {
+            const card = this.createMusicCard(item, index);
+            wrapper.appendChild(card);
+        });
+
+        carousel.appendChild(prevBtn);
+        carousel.appendChild(wrapper);
+        carousel.appendChild(nextBtn);
+
+        return carousel;
+    }
+
+    // ============================================
+    //  MUSIC CARD
     // ============================================
 
     createMusicCard(item, index) {
@@ -58,7 +111,6 @@ class MusicRenderer {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
 
-        // Create card HTML
         card.innerHTML = `
             <div class="content-card__image-wrapper">
                 <img 
@@ -70,7 +122,14 @@ class MusicRenderer {
                 >
                 ${item.type === 'playlist' ? '<span class="content-card__badge">Playlist</span>' : ''}
                 ${item.type === 'album' ? '<span class="content-card__badge">Album</span>' : ''}
-                ${item.preview ? '<span class="content-card__play-overlay" aria-label="Preview available"><svg width="48" height="48" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>' : ''}
+                ${item.preview ? `
+                <div class="content-card__play-overlay" aria-label="Preview available">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="white">
+                        <circle cx="12" cy="12" r="11" fill="rgba(255, 255, 255, 0.95)" />
+                        <polygon points="10 8 16 12 10 16" fill="#000" />
+                    </svg>
+                </div>
+                ` : ''}
             </div>
             
             <div class="content-card__content">
@@ -96,8 +155,6 @@ class MusicRenderer {
                     ` : ''}
                 </div>
                 
-                <p class="content-card__description">${this.escapeHtml(item.description)}</p>
-                
                 <div class="content-card__actions">
                     <a 
                         href="${item.link}" 
@@ -106,9 +163,7 @@ class MusicRenderer {
                         class="content-card__btn content-card__btn--primary"
                         aria-label="Listen on Deezer: ${this.escapeHtml(item.title)}"
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
+                        ${this.getDeezerLogo()}
                         Listen on Deezer
                     </a>
                     
@@ -126,18 +181,100 @@ class MusicRenderer {
             </div>
         `;
 
-        //  event listeners
+        // Attach event listeners
         this.attachCardEvents(card, item);
 
         return card;
     }
 
     // ============================================
-    // ATTACH CARD EVENTS
+    // GET DEEZER LOGO SVG
     // ============================================
 
+    getDeezerLogo() {
+        return `
+            <svg class="deezer-logo" viewBox="0 0 240 240" fill="currentColor">
+                <path d="M192 96h48v24h-48zM192 120h48v24h-48zM192 144h48v24h-48zM144 72h48v24h-48zM144 96h48v24h-48zM144 120h48v24h-48zM144 144h48v24h-48zM96 48h48v24H96zM96 72h48v24H96zM96 96h48v24H96zM96 120h48v24H96zM96 144h48v24H96zM48 96h48v24H48zM48 120h48v24H48zM48 144h48v24H48zM0 120h48v24H0zM0 144h48v24H0z"/>
+            </svg>
+        `;
+    }
+
+
+    attachCarouselEvents() {
+        const prevBtn = this.container.querySelector('.music-carousel__nav--prev');
+        const nextBtn = this.container.querySelector('.music-carousel__nav--next');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.slidePrev());
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.slideNext());
+        }
+
+        // Update navigation state
+        this.updateNavigation();
+    }
+
+    // ============================================
+    // SLIDE NAVV
+    // ============================================
+
+    slideNext() {
+        const maxIndex = Math.max(0, this.items.length - this.itemsPerView);
+        
+        if (this.currentIndex < maxIndex) {
+            this.currentIndex++;
+            this.updateCarousel();
+        }
+    }
+
+    slidePrev() {
+        if (this.currentIndex > 0) {
+            this.currentIndex--;
+            this.updateCarousel();
+        }
+    }
+
+    updateCarousel() {
+        const wrapper = this.container.querySelector('.music-carousel__wrapper');
+        if (!wrapper) return;
+
+        const cardWidth = wrapper.querySelector('.content-card')?.offsetWidth || 0;
+        const gap = 24;
+        const offset = -(this.currentIndex * (cardWidth + gap));
+
+        if (typeof gsap !== 'undefined') {
+            gsap.to(wrapper, {
+                x: offset,
+                duration: 0.6,
+                ease: 'power2.out'
+            });
+        } else {
+            wrapper.style.transform = `translateX(${offset}px)`;
+        }
+
+        this.updateNavigation();
+    }
+
+    updateNavigation() {
+        const prevBtn = this.container.querySelector('.music-carousel__nav--prev');
+        const nextBtn = this.container.querySelector('.music-carousel__nav--next');
+        
+        if (prevBtn) {
+            prevBtn.disabled = this.currentIndex === 0;
+        }
+        
+        if (nextBtn) {
+            const maxIndex = Math.max(0, this.items.length - this.itemsPerView);
+            nextBtn.disabled = this.currentIndex >= maxIndex;
+        }
+    }
+
+  
+
     attachCardEvents(card, item) {
-        // Favorite button
+        // FAVE button
         const favoriteBtn = card.querySelector('[data-action="favorite"]');
         if (favoriteBtn) {
             favoriteBtn.addEventListener('click', (e) => {
@@ -146,7 +283,7 @@ class MusicRenderer {
             });
         }
 
-        // Preview play functionality (if preview available)
+    
         if (item.preview) {
             const playOverlay = card.querySelector('.content-card__play-overlay');
             if (playOverlay) {
@@ -156,60 +293,24 @@ class MusicRenderer {
                 });
             }
         }
-
-        // Card hover effect
-        card.addEventListener('mouseenter', () => {
-            if (typeof gsap !== 'undefined') {
-                gsap.to(card, {
-                    y: -8,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
-            }
-        });
-
-        card.addEventListener('mouseleave', () => {
-            if (typeof gsap !== 'undefined') {
-                gsap.to(card, {
-                    y: 0,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
-            }
-        });
     }
 
-    // ============================================
-    // HANDLE FAVORITE
-    // ============================================
+
 
     handleFavorite(item, button) {
-        // Toggle favorite state
         const isFavorited = button.classList.toggle('favorited');
         
-        // Update button visual
         const svg = button.querySelector('svg');
         if (isFavorited) {
             svg.setAttribute('fill', 'currentColor');
             button.style.color = 'var(--color-accent-red)';
-            
-            // Save to localStorage
-            this.saveFavorite(item);
-            
-            // Show feedback
             this.showToast('Added to favorites!');
         } else {
             svg.setAttribute('fill', 'none');
             button.style.color = '';
-            
-            // Remove from localStorage
-            this.removeFavorite(item.id);
-            
-            // Show feedback
             this.showToast('Removed from favorites');
         }
 
-        // Animate button
         if (typeof gsap !== 'undefined') {
             gsap.fromTo(button, 
                 { scale: 1 },
@@ -225,7 +326,6 @@ class MusicRenderer {
     handlePreview(item) {
         if (!item.preview) return;
 
-        // Create or get audio player
         let audio = document.getElementById('music-preview-player');
         if (!audio) {
             audio = document.createElement('audio');
@@ -233,19 +333,16 @@ class MusicRenderer {
             document.body.appendChild(audio);
         }
 
-        // If already playing this track, pause it
         if (audio.src === item.preview && !audio.paused) {
             audio.pause();
             this.showToast('Preview paused');
             return;
         }
 
-        // Play new preview
         audio.src = item.preview;
         audio.play();
         this.showToast(`Playing preview: ${item.title}`);
 
-        // Auto-stop after 30 seconds
         setTimeout(() => {
             if (audio.src === item.preview) {
                 audio.pause();
@@ -254,33 +351,7 @@ class MusicRenderer {
     }
 
     // ============================================
-    // LOCAL STORAGE HELPERS
-    // ============================================
-
-    saveFavorite(item) {
-        const favorites = this.getFavorites();
-        favorites.push(item);
-        localStorage.setItem('flowstate_music_favorites', JSON.stringify(favorites));
-    }
-
-    removeFavorite(itemId) {
-        let favorites = this.getFavorites();
-        favorites = favorites.filter(fav => fav.id !== itemId);
-        localStorage.setItem('flowstate_music_favorites', JSON.stringify(favorites));
-    }
-
-    getFavorites() {
-        try {
-            const stored = localStorage.getItem('flowstate_music_favorites');
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Error reading favorites:', error);
-            return [];
-        }
-    }
-
-    // ============================================
-    // RENDER LOADING STATE
+    // RENDER STATES
     // ============================================
 
     renderLoadingState() {
@@ -293,10 +364,6 @@ class MusicRenderer {
             </div>
         `;
     }
-
-    // ============================================
-    // RENDER EMPTY STATE
-    // ============================================
 
     renderEmptyState() {
         if (!this.container) return;
@@ -313,10 +380,6 @@ class MusicRenderer {
             </div>
         `;
     }
-
-    // ============================================
-    // RENDER ERROR STATE
-    // ============================================
 
     renderErrorState(message) {
         if (!this.container) return;
@@ -336,17 +399,17 @@ class MusicRenderer {
     }
 
     // ============================================
-    // ANIMATE CARDS
+    // ANIMATE CAROUSEL IN
     // ============================================
 
-    animateCards() {
+    animateCarouselIn() {
         const cards = this.container.querySelectorAll('.content-card');
         
         gsap.to(cards, {
             opacity: 1,
             y: 0,
             duration: 0.6,
-            stagger: 0.1,
+            stagger: 0.08,
             ease: 'power2.out'
         });
     }
@@ -366,19 +429,16 @@ class MusicRenderer {
     }
 
     showToast(message, duration = 3000) {
-        // Remove existing toast
         const existingToast = document.querySelector('.toast-notification');
         if (existingToast) {
             existingToast.remove();
         }
 
-        // Create toast
         const toast = document.createElement('div');
         toast.className = 'toast-notification';
         toast.textContent = message;
         document.body.appendChild(toast);
 
-        // Animate in
         if (typeof gsap !== 'undefined') {
             gsap.fromTo(toast,
                 { opacity: 0, y: 50 },
@@ -386,7 +446,6 @@ class MusicRenderer {
             );
         }
 
-        // Remove after duration
         setTimeout(() => {
             if (typeof gsap !== 'undefined') {
                 gsap.to(toast, {
