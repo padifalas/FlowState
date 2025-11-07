@@ -226,15 +226,14 @@ class Navigation {
                 if (isMobileMenuOpen) {
                     e.preventDefault();
                     this.closeMobileMenu();
-                    
                     setTimeout(() => {
                         if (isAnchor) {
                             this.scrollToAnchor(href);
                         } else {
                             console.log('[Navigation] Navigating to:', href);
-                            window.location.href = href;
+                            window.location.assign(href);
                         }
-                    }, 300);
+                    }, 10);
                 } else if (isAnchor) {
                     e.preventDefault();
                     this.scrollToAnchor(href);

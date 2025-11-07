@@ -312,9 +312,13 @@ margin-left: 0;
 /* Mobile Navigation Toggle (for future mobile menu) */
 @media (max-width: 768px) {
     .nav-links {
+        display: none;
         gap: 1.5rem;
     }
-    
+    .nav-links.open {
+        display: flex;
+        flex-direction: column;
+    }
     .nav-link {
         font-size: 0.9rem;
     }
