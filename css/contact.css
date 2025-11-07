@@ -279,7 +279,14 @@
     padding: 20px;
     overflow-y: auto;
 }
-
+    .modal-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color:black !important;
+    line-height: 1.6;
+    max-width: 450px;
+    margin: 0 auto;
+}
 .modal[hidden] {
     display: none;
 }
@@ -356,8 +363,21 @@
 .contact-form-modal {
     display: flex;
     flex-direction: column;
+    gap: var(--space-md);
 }
 
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
 .form-group {
     margin-bottom: var(--space-md);
 }
@@ -668,6 +688,7 @@
 
     .modal-subtitle {
     margin: 0;
+    font-family: 'Roboto', sans-serif;
     font-size: 0.95rem;
     color:black !important;
     line-height: 1.6;

@@ -12,7 +12,8 @@
     
     <title>Contact - FlowState</title>
     
- 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/contact.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -203,104 +204,75 @@
         </div>
         
         <form class="contact-form-modal" id="contact-form-modal" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
-            <div class="form-group">
-                <label for="name" class="form-label">
-                    Name <span class="form-required">*</span>
-                </label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    class="form-input" 
-                    placeholder="Your Name"
-                    required 
-                    aria-required="true"
-                    aria-describedby="name-error"
-                >
-                <span class="form-error" id="name-error" role="alert"></span>
-            </div>
+<form class="contact-form-modal" id="contact-form-modal" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="name" class="form-label">
+                Name <span class="form-required">*</span>
+            </label>
+            <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="form-input" 
+                placeholder="Your Name"
+                required 
+                aria-required="true"
+                aria-describedby="name-error"
+            >
+            <span class="form-error" id="name-error" role="alert"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="email" class="form-label">
-                    Email <span class="form-required">*</span>
-                </label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    class="form-input" 
-                    placeholder="youremail@whatever.com"
-                    required 
-                    aria-required="true"
-                    aria-describedby="email-error"
-                >
-                <span class="form-error" id="email-error" role="alert"></span>
-            </div>
+        <div class="form-group">
+            <label for="email" class="form-label">
+                Email <span class="form-required">*</span>
+            </label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                class="form-input" 
+                placeholder="youremail@whatever.com"
+                required 
+                aria-required="true"
+                aria-describedby="email-error"
+            >
+            <span class="form-error" id="email-error" role="alert"></span>
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="subject" class="form-label">
-                    Subject <span class="form-required">*</span>
-                </label>
-                <select 
-                    id="subject" 
-                    name="subject" 
-                    class="form-select" 
-                    required 
-                    aria-required="true"
-                    aria-describedby="subject-error"
-                >
-                    <option value="">Select a subject</option>
-                    <option value="feedback">General Feedback</option>
-                    <option value="feature">Feature Request</option>
-                    <option value="bug">Bug Report</option>
-                    <option value="collaboration">Collaboration</option>
-                    <option value="other">Other</option>
-                </select>
-                <span class="form-error" id="subject-error" role="alert"></span>
-            </div>
+    <!-- rest stays the same -->
+    <div class="form-group">
+        <label for="subject" class="form-label">
+            Subject <span class="form-required">*</span>
+        </label>
+        <select id="subject" name="subject" class="form-select" required aria-required="true" aria-describedby="subject-error">
+            <option value="">Select a subject</option>
+            <option value="feedback">General Feedback</option>
+            <option value="feature">Feature Request</option>
+            <option value="bug">Bug Report</option>
+            <option value="collaboration">Collaboration</option>
+            <option value="other">Other</option>
+        </select>
+        <span class="form-error" id="subject-error" role="alert"></span>
+    </div>
 
-            <div class="form-group">
-                <label for="message" class="form-label">
-                    Message <span class="form-required">*</span>
-                </label>
-                <textarea 
-                    id="message" 
-                    name="message" 
-                    class="form-textarea" 
-                    rows="4" 
-                    placeholder="type your message here"
-                    required 
-                    aria-required="true"
-                    aria-describedby="message-error message-counter"
-                    maxlength="1000"
-                ></textarea>
-                <div class="form-meta">
-                    <span class="form-error" id="message-error" role="alert"></span>
-                    <span class="form-counter" id="message-counter">0 / 1000 characters</span>
-                </div>
-            </div>
+    <div class="form-group">
+        <label for="message" class="form-label">
+            Message <span class="form-required">*</span>
+        </label>
+        <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="type your message here" required aria-required="true" aria-describedby="message-error message-counter" maxlength="1000"></textarea>
+        <div class="form-meta">
+            <span class="form-error" id="message-error" role="alert"></span>
+            <span class="form-counter" id="message-counter">0 / 1000 characters</span>
+        </div>
+    </div>
 
-           
-            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+    <button type="submit" class="form-submit">Send Message</button>
+</form>
 
-            <button type="submit" class="form-submit">Send Message</button>
-
-            <div class="form-success" hidden role="status">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <p>Thank you! Your message has been sent successfully.</p>
-            </div>
-
-            <div class="form-failure" hidden role="alert">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-                <p>Sorry, something went wrong. Please try again.</p>
-            </div>
-        </form>
     </div>
 </div>
 
