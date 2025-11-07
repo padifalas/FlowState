@@ -162,7 +162,8 @@ ul {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    /* ensure nav and its dropdown sit above the page-dimming overlay */
+    z-index: 1300;
     background: rgba(18, 20, 24, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(240, 236, 217, 0.1);
@@ -1148,7 +1149,8 @@ margin-left: 0;
     .nav-links {
         display: flex; 
         position: fixed;
-        top: 100%;
+       
+        top: 70px;
         left: 0;
         right: 0;
         background: rgba(18,20,24,0.98);
@@ -1159,7 +1161,8 @@ margin-left: 0;
         border-bottom: 1px solid rgba(240,236,217,0.04);
         box-shadow: var(--shadow-md);
         height: auto;
-        max-height: calc(100 vh - 100px);
+       
+        max-height: calc(100vh - 70px);
         overflow: auto;
 
         /* hidden state - usess transform & opacity to animate smoothly */
@@ -1168,7 +1171,7 @@ margin-left: 0;
         opacity: 0;
         pointer-events: none;
         transition: transform 360ms cubic-bezier(.2,.9,.3,1), opacity 240ms cubic-bezier(.2,.9,.3,1);
-        z-index: 1000;
+        z-index: 1100;
     }
 
     .nav-links.open {
