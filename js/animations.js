@@ -8,6 +8,11 @@ const PARTICLE_CONFIG = {
 };
 
 // ===========================================
+
+//  GSAP plugins  registered 
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+}
 // INTRO LOADER ANIMATION
 // ===========================================
 function createIntroLoader() {
