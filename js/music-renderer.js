@@ -247,10 +247,11 @@ class MusicRenderer {
         if (typeof gsap !== 'undefined') {
             gsap.to(wrapper, {
                 x: offset,
-                duration: 0.6,
-                ease: 'power2.out'
+                duration: 0.32,
+                ease: 'power1.out'
             });
         } else {
+            wrapper.style.transition = 'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
             wrapper.style.transform = `translateX(${offset}px)`;
         }
 
