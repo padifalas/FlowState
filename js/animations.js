@@ -394,6 +394,7 @@ function initScrollAnimations() {
         });
     });
 
+    
     // about section title
     const aboutTitle = document.querySelector('.about__title');
     if (aboutTitle) {
@@ -412,6 +413,107 @@ function initScrollAnimations() {
         });
     }
 }
+
+// ===========================================
+// ABOUT SECTION 
+
+    const aboutSection = document.querySelector('.about');
+    if (aboutSection) {
+      
+        ScrollTrigger.create({
+            trigger: '.hero',
+            start: 'bottom bottom',
+            end: '+=100%',
+            pin: false,
+            scrub: true
+        });
+
+       
+        gsap.from(aboutSection, {
+            scrollTrigger: {
+                trigger: aboutSection,
+                start: 'top bottom',
+                end: 'top 20%',
+                scrub: 1.5,
+                invalidateOnRefresh: true
+            },
+            y: 200,
+            scale: 0.9,
+            opacity: 0,
+            transformOrigin: 'center top',
+            ease: "power2.out"
+        });
+
+       
+        const aboutTitle = document.querySelector('.about__title');
+        if (aboutTitle) {
+            gsap.from(aboutTitle, {
+                scrollTrigger: {
+                    trigger: aboutTitle,
+                    start: 'top 85%',
+                    end: 'top 50%',
+                    scrub: 1
+                },
+                scale: 0.7,
+                opacity: 0,
+                rotationX: -90,
+                y: 100,
+                transformOrigin: 'center center',
+                ease: "power3.out"
+            });
+        }
+
+    
+        const aboutIntro = document.querySelector('.about__intro');
+        if (aboutIntro) {
+            gsap.from(aboutIntro, {
+                scrollTrigger: {
+                    trigger: aboutIntro,
+                    start: 'top 85%',
+                    end: 'top 60%',
+                    scrub: 1
+                },
+                x: -100,
+                opacity: 0,
+                filter: 'blur(10px)',
+                ease: "power2.out"
+            });
+        }
+
+      
+        const howItWorks = document.querySelector('.about__how-it-works');
+        if (howItWorks) {
+            gsap.from(howItWorks, {
+                scrollTrigger: {
+                    trigger: howItWorks,
+                    start: 'top 85%',
+                    end: 'top 55%',
+                    scrub: 1
+                },
+                y: 80,
+                opacity: 0,
+                scale: 0.95,
+                ease: "power2.out"
+            });
+        }
+
+     
+        gsap.utils.toArray('.about__step').forEach((step, index) => {
+            gsap.from(step, {
+                scrollTrigger: {
+                    trigger: step,
+                    start: 'top 90%',
+                    end: 'top 70%',
+                    scrub: 1
+                },
+                x: -50,
+                opacity: 0,
+                ease: "power2.out",
+                delay: index * 0.1
+            });
+        });
+    }
+
 
 // ===========================================
 // SVG & MOTIONPATH ANIMATIONS
