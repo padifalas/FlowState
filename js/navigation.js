@@ -233,21 +233,23 @@ class Navigation {
 
                 console.log('[Navigation] Link clicked:', href, 'Is anchor?', isAnchor);
 
-                if (isMobileMenuOpen) {
+                if (isMobileMenuOpen && isAnchor) {
+                // For anchor links on same page, close menu then scroll
                     e.preventDefault();
                     this.closeMobileMenu();
                     setTimeout(() => {
-                        if (isAnchor) {
-                            this.scrollToAnchor(href);
-                        } else {
-                            console.log('[Navigation] Navigating to:', href);
-                            window.location.assign(href);
-                        }
-                    }, 10);
+                        this.scrollToAnchor(href);
+                    }, 400);
+                } else if (isMobileMenuOpen && !isAnchor) {
+                 // For navigation to different pages, navigate immediately
+                    // Don't prevent default - let the browser handle the navigation
+                    console.log('[Navigation] Navigating to:', href);
+                  
                 } else if (isAnchor) {
                     e.preventDefault();
                     this.scrollToAnchor(href);
                 }
+               
             });
         });
 

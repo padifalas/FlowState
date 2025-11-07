@@ -1195,7 +1195,7 @@ margin-left: 0;
         color: var(--color-text-primary);
     }
 
-        .nav-links .nav-link[href*="#"] {
+    .nav-links.open .nav-link {
         pointer-events: auto !important;
     }
 
