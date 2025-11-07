@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#282D35">
+    <title>Watchlist - FlowState</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=JetBrains+Mono:wght@400;500;700&family=Quando&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/hubs.css">
+    <link rel="stylesheet" href="css/search.css">
+    <link rel="stylesheet" href="css/watchlist.css">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js" defer></script>
+
+   
+    <script src="js/navigation.js" defer></script>
+
+    <script src="js/animations.js"></script>
+  
+    <script src="api/deezer-api.js"></script>
+    <script src="api/tmdb-api.js"></script>
+    <script src="js/search-controller.js" defer></script>
+        <script>
+                //  sample watchlist stuff to see how it looks
+                (function preloadSamples(){
+                    function getArray(key){
+                        try { const v = JSON.parse(localStorage.getItem(key)||'[]'); return Array.isArray(v)? v: []; } catch(e){ return []; }
+                    }
+                    function setArray(key, arr){
+                        try { localStorage.setItem(key, JSON.stringify(arr)); } catch(e){}
+                    }
+
+                    // Movie
+                    const movieKey = 'flowstate_movie_watchlist';
+                    let movies = getArray(movieKey);
+                    if (!movies.length){
+                        movies.push({
+                            id: 533535,
+                            title: 'Deadpool & Wolverine',
+                            image: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+                            imageLarge: 'https://image.tmdb.org/t/p/w780/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+                            link: 'https://www.themoviedb.org/movie/533535',
+                            rating: 7.7,
+                            releaseYear: 2024,
+                            overview: 'Deadpool must reluctantly suit-up again with an even more reluctant Wolverine when his homeworld faces an existential threat.',
+                            mood: 'energize'
+                        });
+                        setArray(movieKey, movies);
+                    }
+
+                                            // album 
+                    const musicKey = 'flowstate_music_favorites';
+                    let music = getArray(musicKey);
+                    if (!music.length){
+                        music.push({
+                                                    id: 'gone-now-bleachers',
+                                                    type: 'album',
+                                                    title: 'Gone Now',
+                                                    image: 'https://upload.wikimedia.org/wikipedia/en/5/5a/Bleachers_-_Gone_Now.png',
+                                                    link: 'https://www.deezer.com/search/album/gone%20now%20bleachers',
+                                                    artist: 'Bleachers',
+                                                    creator: 'Bleachers',
+                                                    trackCount: 12,
+                                                    mood: 'energize'
+                        });
+                        setArray(musicKey, music);
+                    }
+
+                    // Game
+                    const gameKey = 'flowstate_game_favorites';
+                    let games = getArray(gameKey);
+                    if (!games.length){
+                        games.push({
+                            id: 3498,
+                            title: 'Grand Theft Auto V',
+                            image: 'https://media.rawg.io/media/games/20a/20aa03a10cda45239fe22d035c0ebe64.jpg',
+                            link: 'https://rawg.io/games/grand-theft-auto-v',
+                            rating: 4.47,
+                            metacritic: 92,
+                            tags: ['Action','Open World','Multiplayer'],
+                            mood: 'energize'
+                        });
+                        setArray(gameKey, games);
+                    }
+                })();
+        </script>
+    <script src="js/watchlist.js" defer></script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav id="main-navigation" aria-label="Main navigation"></nav>
+
+    <main id="main-content" class="watchlist">
+      
+        <section class="hub-hero watchlist-hero" aria-labelledby="watchlist-title">
+            <div class="hub-hero__atmosphere" aria-hidden="true"></div>
+            <div class="hub-hero__content watchlist-hero__content">
+                <h1 id="watchlist-title" class="hub-hero__title watchlist-hero__title">Your Watchlist</h1>
+                <p class="hub-hero__description watchlist-hero__subtitle">All your saved movies, favorite music, and games in one elegant place.</p>
+                <div class="watchlist-hero__stats" aria-live="polite">
+                    <span class="watchlist-hero__stat" data-stat="movies">Movies: <strong>0</strong></span>
+                    <span class="watchlist-hero__stat" data-stat="music">Music: <strong>0</strong></span>
+                    <span class="watchlist-hero__stat" data-stat="games">Games: <strong>0</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <nav class="wl-filters" role="tablist" aria-label="Filter watchlist">
+            <button class="wl-filter wl-filter--active" data-filter="all" role="tab" aria-selected="true">All</button>
+            <button class="wl-filter" data-filter="movies" role="tab" aria-selected="false">Movies</button>
+            <button class="wl-filter" data-filter="music" role="tab" aria-selected="false">Music</button>
+            <button class="wl-filter" data-filter="games" role="tab" aria-selected="false">Games</button>
+        </nav>
+
+        <!--  Filters for moood-->
+        <nav class="wl-mood-filters" role="tablist" aria-label="Filter by mood">
+            <button class="wl-mood-chip wl-mood-chip--all wl-mood-chip--active" data-mood="all" role="tab" aria-selected="true">All moods</button>
+            <button class="wl-mood-chip wl-mood-chip--focus" data-mood="focus" role="tab" aria-selected="false">Focus</button>
+            <button class="wl-mood-chip wl-mood-chip--relax" data-mood="relax" role="tab" aria-selected="false">Relax</button>
+            <button class="wl-mood-chip wl-mood-chip--energize" data-mood="energize" role="tab" aria-selected="false">Energize</button>
+            <button class="wl-mood-chip wl-mood-chip--creative" data-mood="creative" role="tab" aria-selected="false">Creative</button>
+            <button class="wl-mood-chip wl-mood-chip--melancholy" data-mood="melancholy" role="tab" aria-selected="false">Melancholy</button>
+        </nav>
+
+       
+        <section class="wl-section" aria-labelledby="wl-heading">
+            <h2 id="wl-heading" class="visually-hidden">Saved items</h2>
+            <div id="watchlist-grid" class="wl-grid" aria-live="polite">
+                <!-- the cards content for watchlist will be heree from the js scrrip -->
+            </div>
+            <div id="watchlist-empty" class="wl-empty" hidden>
+                <button class="wl-empty__close" aria-label="Close empty state">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3>Your watchlist is empty</h3>
+                <p>Save movies, favorite tracks, and games to see them here.</p>
+                <a href="index.html#mood-hubs" class="wl-empty__cta">Explore Hubs</a>
+            </div>
+        </section>
+    </main>
+
+        
+        <footer class="footer">
+            <div class="footer__content">
+                <p class="footer__text">&copy; <span id="copyright-year"></span> FlowState. Find Your Perfect Work Vibe.</p>
+                <nav class="footer__nav" aria-label="Footer navigation">
+                    <ul class="footer__links">
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </footer>
+</body>
+</html>

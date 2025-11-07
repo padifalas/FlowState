@@ -304,10 +304,12 @@ class MusicRenderer {
         if (isFavorited) {
             svg.setAttribute('fill', 'currentColor');
             button.style.color = 'var(--color-accent-red)';
+            this.persistFavorite(item, true);
             this.showToast('Added to favorites!');
         } else {
             svg.setAttribute('fill', 'none');
             button.style.color = '';
+            this.persistFavorite(item, false);
             this.showToast('Removed from favorites');
         }
 
@@ -317,6 +319,51 @@ class MusicRenderer {
                 { scale: 1.2, duration: 0.1, yoyo: true, repeat: 1 }
             );
         }
+    }
+
+    // ===============================
+    // LOCAL STORAGE FAVORITES
+    // ===============================
+    persistFavorite(item, add) {
+        const KEY = 'flowstate_music_favorites';
+        let list = [];
+        try {
+            const raw = localStorage.getItem(KEY);
+            list = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(list)) list = [];
+        } catch (e) { list = []; }
+
+        if (add) {
+            // avoid duplicates by id
+            if (!list.some(x => String(x.id) === String(item.id))) {
+                const minimal = {
+                    id: item.id,
+                    type: item.type,
+                    title: item.title,
+                    image: item.image || item.imageLarge || '',
+                    link: item.link,
+                    artist: item.artist || '',
+                    creator: item.creator || '',
+                    trackCount: item.trackCount || undefined,
+                    preview: item.preview || undefined,
+                    mood: this.getCurrentMood()
+                };
+                list.push(minimal);
+            }
+        } else {
+            list = list.filter(x => String(x.id) !== String(item.id));
+        }
+
+        try { localStorage.setItem(KEY, JSON.stringify(list)); } catch(e){}
+    }
+
+    getCurrentMood() {
+        const path = window.location.pathname.toLowerCase();
+        const hubs = ['focus','relax','energize','creative','melancholy'];
+        for (const h of hubs) {
+            if (path.includes(h)) return h;
+        }
+        return 'unknown';
     }
 
     // ============================================

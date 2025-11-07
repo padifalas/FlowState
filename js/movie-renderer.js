@@ -398,8 +398,32 @@ class MovieRenderer {
 
     saveToWatchlist(movie) {
         const watchlist = this.getWatchlist();
-        watchlist.push(movie);
+       
+        if (!watchlist.some(m => String(m.id) === String(movie.id))) {
+            
+            const minimal = {
+                id: movie.id,
+                title: movie.title,
+                image: movie.image || movie.imageLarge || '',
+                imageLarge: movie.imageLarge || '',
+                link: movie.link,
+                rating: movie.rating || 'N/A',
+                releaseYear: movie.releaseYear || '',
+                overview: movie.overview || movie.description || '',
+                mood: this.getCurrentMood()
+            };
+            watchlist.push(minimal);
+        }
         localStorage.setItem('flowstate_movie_watchlist', JSON.stringify(watchlist));
+    }
+
+    getCurrentMood() {
+        const path = window.location.pathname.toLowerCase();
+        const hubs = ['focus','relax','energize','creative','melancholy'];
+        for (const h of hubs) {
+            if (path.includes(h)) return h;
+        }
+        return 'unknown';
     }
 
     removeFromWatchlist(movieId) {

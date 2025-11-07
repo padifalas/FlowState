@@ -9,7 +9,7 @@ const PARTICLE_CONFIG = {
 
 // ===========================================
 
-//  GSAP plugins registered
+//  GSAP  registere
 if (typeof gsap !== 'undefined') {
     if (typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
@@ -279,7 +279,7 @@ function initHeroAnimation() {
 
     const tl = gsap.timeline({ delay: 0.3 });
 
-    // animated title entrance
+    // animated title 
     const titleLines = heroTitle.querySelectorAll('.hero__title-line, .hero__title-accent');
     tl.from(titleLines, {
         duration: 1.2,
@@ -311,7 +311,7 @@ function initHeroAnimation() {
             ease: "elastic.out(1, 0.5)",
             delay: 1.5
         });
-    // Optional subtle float animation for CTA (disabled by default)
+  
     // gsap.to(heroCta, {
     //     y: -10,
     //     duration: 2,
@@ -560,24 +560,32 @@ function initAllAnimations() {
         new ParticleSystem(heroSection);
     }
 
-    // init hub hero particles if on hub page
+    
     const hubHero = document.querySelector('.hub-hero');
-    if (hubHero) {
+    const isWatchlist = document.querySelector('.watchlist');
+    if (hubHero && !isWatchlist) {
         new ParticleSystem(hubHero);
     }
 
-    // init all GSAP animations
+    // init  gSap animations
     initHeroAnimation();
     initScrollAnimations();
     initSVGAnimations();
     initAdvanced3DAnimations();
     initTextRevealAnimations();
 
-    //  scroll behavior 
+    
+    if (document.querySelector('.watchlist')) {
+        if (window.WatchlistAnimations && typeof window.WatchlistAnimations.init === 'function') {
+            window.WatchlistAnimations.init();
+        }
+    }
+
+    //  scroll  
     document.querySelectorAll('a[href^="#"]:not(.nav-link)').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
-            if (!href || href === '#') return; // ignore empty anchors
+            if (!href || href === '#') return; 
             const target = document.querySelector(href);
             if (!target) return;
 
@@ -645,3 +653,68 @@ if (typeof module !== 'undefined' && module.exports) {
         initAllAnimations
     };
 }
+
+// ===========================================
+// WATCHLIST PAGE ANIMATI
+// ===========================================
+(function(){
+    if (typeof window === 'undefined' || typeof gsap === 'undefined') return;
+
+    const WatchlistAnimations = {
+        init(){
+            const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+            const hero = document.querySelector('.watchlist-hero__content');
+            const stats = document.querySelectorAll('.watchlist-hero__stat');
+            const filters = document.querySelectorAll('.wl-filter');
+
+            if (hero){
+                tl.from(hero.querySelector('.watchlist-hero__title'), { y: 20, opacity: 0, duration: 0.5 })
+                  .from(hero.querySelector('.watchlist-hero__subtitle'), { y: 16, opacity: 0, duration: 0.4 }, '-=0.25')
+                  .from(stats, { y: 10, opacity: 0, duration: 0.4, stagger: 0.08 }, '-=0.2');
+            }
+
+            if (filters.length){
+                tl.from(filters, { y: 12, opacity: 0, duration: 0.4, stagger: 0.06 }, '-=0.2');
+            }
+            const moodChips = document.querySelectorAll('.wl-mood-chip');
+            if (moodChips.length){
+                tl.from(moodChips, { y: 14, opacity: 0, duration: 0.35, stagger: 0.05 }, '-=0.15');
+            }
+        },
+
+        animateGridIn(grid){
+            const cards = grid.querySelectorAll('.wl-card');
+            gsap.set(cards, { opacity: 0, y: 16 });
+            gsap.to(cards, { opacity: 1, y: 0, duration: 0.45, stagger: 0.06, ease: 'power2.out', onComplete: () => {
+                
+                const badges = grid.querySelectorAll('.wl-card__mood-badge');
+                if (badges.length) {
+                    gsap.fromTo(badges, { scale: 0.4, opacity: 0 }, { scale:1, opacity:1, duration:0.4, stagger:0.05, ease:'back.out(1.7)' });
+                }
+            }});
+        },
+
+        animateEmpty(empty){
+            gsap.fromTo(empty, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35 });
+        },
+
+        animateCardRemove(card, onDone){
+            gsap.to(card, { opacity: 0, scale: 0.95, duration: 0.2, onComplete: () => {
+                card.remove();
+                if (typeof onDone === 'function') onDone();
+            }});
+        },
+
+        attachCardHover(card){
+            card.addEventListener('mouseenter', () => gsap.to(card, { y: -6, duration: 0.2 }));
+            card.addEventListener('mouseleave', () => gsap.to(card, { y: 0, duration: 0.2 }));
+            const badge = card.querySelector('.wl-card__mood-badge');
+            if (badge) {
+                card.addEventListener('mouseenter', () => gsap.to(badge, { scale:1.08, duration:0.25, ease:'power2.out', boxShadow:'0 0 0 3px rgba(255,255,255,0.15)' }));
+                card.addEventListener('mouseleave', () => gsap.to(badge, { scale:1, duration:0.25, ease:'power2.inOut', boxShadow:'none' }));
+            }
+        }
+    };
+
+    window.WatchlistAnimations = WatchlistAnimations;
+})();

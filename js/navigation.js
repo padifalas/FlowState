@@ -109,6 +109,7 @@ class Navigation {
                 { name: 'Home', href: '#home', id: 'home', isAnchor: true },
                 { name: 'About', href: '#about', id: 'about', isAnchor: true },
                 { name: 'Hubs', href: '#mood-hubs', id: 'hubs', isAnchor: true },
+                { name: 'Watchlist', href: 'watchlist.html', id: 'watchlist', isAnchor: false },
                 { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
             ];
         } else {
@@ -129,6 +130,12 @@ class Navigation {
                     name: 'Hubs', 
                     href: relPrefix ? `${relPrefix}index.html#mood-hubs` : 'index.html#mood-hubs', 
                     id: 'hubs', 
+                    isAnchor: false 
+                },
+                { 
+                    name: 'Watchlist', 
+                    href: relPrefix ? `${relPrefix}watchlist.html` : 'watchlist.html', 
+                    id: 'watchlist', 
                     isAnchor: false 
                 },
                 { 
@@ -194,6 +201,9 @@ class Navigation {
         }
         
         if (linkId === 'contact' && currentPage === 'contact') {
+            return true;
+        }
+        if (linkId === 'watchlist' && currentPage === 'watchlist') {
             return true;
         }
         
