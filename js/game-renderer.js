@@ -7,7 +7,7 @@ class GameRenderer {
         this.container = null;
         this.currentIndex = 0;
         this.games = [];
-        this.cardsPerView = 4; // Default cards visible at once
+        this.cardsPerView = 4; 
         this.autoPlayInterval = null;
     }
 
@@ -26,7 +26,7 @@ class GameRenderer {
     }
 
     // ============================================
-    // UPDATE CARDS PER VIEW (Responsive)
+    // UPDATE CARDS PER VIEW 
     // ============================================
 
     updateCardsPerView() {
@@ -60,7 +60,7 @@ class GameRenderer {
             return;
         }
 
-        // Create carousel structure
+        //  carousel structure
         this.container.innerHTML = `
             <div class="game-carousel">
                 <button class="game-carousel__nav game-carousel__nav--prev" aria-label="Previous games">
@@ -87,19 +87,19 @@ class GameRenderer {
             </div>
         `;
 
-        // Get references
+        //  references
         const track = this.container.querySelector('.game-carousel__track');
         const prevBtn = this.container.querySelector('.game-carousel__nav--prev');
         const nextBtn = this.container.querySelector('.game-carousel__nav--next');
         const indicatorsContainer = this.container.querySelector('.game-carousel__indicators');
 
-        // Create game cards
+        //  game cards
         games.forEach((game, index) => {
             const card = this.createGameCard(game, index);
             track.appendChild(card);
         });
 
-        // Create indicators
+        //  indicators
         const pageCount = Math.ceil(games.length / this.cardsPerView);
         for (let i = 0; i < pageCount; i++) {
             const indicator = document.createElement('button');
@@ -110,19 +110,19 @@ class GameRenderer {
             indicatorsContainer.appendChild(indicator);
         }
 
-        // Attach navigation events
+        //  navigation events
         prevBtn.addEventListener('click', () => this.navigate('prev'));
         nextBtn.addEventListener('click', () => this.navigate('next'));
 
-        // Initial position
+        // init position
         this.updateCarouselPosition();
 
-        // Animate cards in
+      
         if (typeof gsap !== 'undefined') {
             this.animateCardsIn();
         }
 
-        // Auto-play (optional - can be disabled)
+        
         // this.startAutoPlay();
     }
 
@@ -267,13 +267,13 @@ class GameRenderer {
     // ============================================
 
     attachCardEvents(card, game) {
-        // Info button
+        
         const infoBtn = card.querySelector('[data-action="info"]');
         if (infoBtn) {
             infoBtn.addEventListener('click', () => this.showGameInfo(game));
         }
 
-        // Favorite button
+       
         const favBtn = card.querySelector('[data-action="favorite"]');
         if (favBtn) {
             favBtn.addEventListener('click', () => this.toggleFavorite(game, favBtn));
@@ -329,7 +329,7 @@ class GameRenderer {
         if (!track) return;
 
         const cardWidth = track.querySelector('.game-card')?.offsetWidth || 0;
-        const gap = 24; // CSS gap value
+        const gap = 24; 
         const offset = -(this.currentIndex * (cardWidth + gap));
 
         if (typeof gsap !== 'undefined') {
@@ -367,7 +367,7 @@ class GameRenderer {
         this.autoPlayInterval = setInterval(() => {
             this.navigate('next');
             
-            // Loop back to start if at end
+            // looop back to start if at end
             if (this.currentIndex >= this.games.length - this.cardsPerView) {
                 setTimeout(() => {
                     this.currentIndex = 0;
@@ -386,11 +386,11 @@ class GameRenderer {
     }
 
     // ============================================
-    // SHOW GAME INFO (Modal or Expanded View)
+    // SHOW GAME INFO 
     // ============================================
 
     showGameInfo(game) {
-        // Create modal overlay
+        //  modal overlay
         const modal = document.createElement('div');
         modal.className = 'game-modal';
         modal.innerHTML = `
@@ -565,9 +565,7 @@ class GameRenderer {
         `;
     }
 
-    // ============================================
-    // ANIMATE CARDS IN
-    // ============================================
+
 
     animateCardsIn() {
         const cards = this.container.querySelectorAll('.game-card');
