@@ -2,9 +2,9 @@
 /api/api-config.local.js
 /api/api-secrets.js
 
-# Optional: ignore dotenv files if you add them later
+
 .env
 .env.local
 
-# Node modules (if you add any node tooling)
+# Node modules
 node_modules/

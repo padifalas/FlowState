@@ -7,11 +7,11 @@ class HubController {
         this.currentHub = this.detectHub();
         this.currentFilter = 'all';
         
-        // Initialize services
+        // init services
         this.deezerAPI = new DeezerAPI();
         this.musicRenderer = new MusicRenderer();
         
-        // Initialize TMDB API
+        // init TMDB API
         let tmdbKey = '5f8501a4f0d878bdde0a35fad39d8ca3';
         try {
             if (typeof API_CONFIG !== 'undefined' && API_CONFIG.tmdb && API_CONFIG.tmdb.apiKey) {
@@ -23,7 +23,7 @@ class HubController {
         this.tmdbAPI = new TMDBAPI(tmdbKey);
         this.movieRenderer = new MovieRenderer();
         
-        // Initialize RAWG API for games
+        // RAWG API for games
         let rawgKey = '35ff0bb7928b4adeaa14c5fced1a69ad';
         try {
             if (typeof API_CONFIG !== 'undefined' && API_CONFIG.rawg && API_CONFIG.rawg.apiKey) {
@@ -35,7 +35,7 @@ class HubController {
         this.rawgAPI = new RAWGAPI(rawgKey);
         this.gameRenderer = new GameRenderer();
         
-        // Cache for loaded content
+        // cahce for loaded content
         this.contentCache = {
             music: null,
             movies: null,
@@ -75,17 +75,17 @@ class HubController {
     async init() {
         console.log(`Initializing ${this.currentHub} hub...`);
         
-        // Setup UI elements
+        // etting up UI elements
         this.setupContainers();
         this.setupFilterButtons();
         
-        // Load initial content
+        //  initial content
         await this.loadContent();
         
-        // Setup event listeners
+      
         this.attachEvents();
         
-        console.log('Hub initialized successfully');
+        console.log('hubb initialized successfully');
     }
 
     // ============================================
@@ -113,7 +113,7 @@ class HubController {
     }
 
     // ============================================
-    // SETUP FILTER BUTTONS
+    //  FILTER BUTTONS
     // ============================================
 
     setupFilterButtons() {
@@ -128,11 +128,11 @@ class HubController {
     }
 
     // ============================================
-    // HANDLE FILTER CHANGE
+    //  FILTER CHANGE
     // ============================================
 
     handleFilterChange(filter, clickedButton) {
-        // Update active state
+        //  active stateupdate
         document.querySelectorAll('.filter-nav__btn').forEach(btn => {
             btn.classList.remove('filter-nav__btn--active');
             btn.setAttribute('aria-pressed', 'false');
@@ -141,10 +141,10 @@ class HubController {
         clickedButton.classList.add('filter-nav__btn--active');
         clickedButton.setAttribute('aria-pressed', 'true');
         
-        // Store current filter
+        // storeing current filter
         this.currentFilter = filter;
         
-        // Show/hide sections
+      
         this.toggleSections(filter);
         
         // Animate transition
@@ -175,7 +175,7 @@ class HubController {
 
     async loadContent() {
         try {
-            // Load all content in parallel
+           
             await Promise.all([
                 this.loadMusicContent(),
                 this.loadMoviesContent(),
@@ -195,30 +195,30 @@ class HubController {
     async loadMusicContent() {
         console.log(`Loading music for ${this.currentHub} hub...`);
         
-        // Show loading state
+       
         this.musicRenderer.renderLoadingState();
         
         try {
-            // Get playlists and albums for this mood
+           
             const [playlists, albums] = await Promise.all([
                 this.deezerAPI.getMoodContent(this.currentHub, 'playlists', 8),
                 this.deezerAPI.getMoodContent(this.currentHub, 'albums', 4)
             ]);
             
-            // Combine and shuffle
+          
             const allMusic = [...playlists, ...albums];
             const shuffled = this.shuffleArray(allMusic);
             
-            // Cache the results
+            
             this.contentCache.music = shuffled;
             
-            // Render music cards
+            
             this.musicRenderer.render(shuffled);
             
             console.log(`Loaded ${shuffled.length} music items`);
             
         } catch (error) {
-            console.error('Error loading music:', error);
+            console.error('errorrrrrrrrrr loading music:', error);
             this.musicRenderer.renderErrorState('Failed to load music. Please try again later.');
         }
     }
@@ -230,11 +230,11 @@ class HubController {
     async loadMoviesContent() {
         if (!this.moviesContainer) return;
 
-        // Show loading UI
+        //  loading UI
         this.movieRenderer.renderLoadingState();
 
         try {
-            // If we have cached movies for this hub, use them
+            // If the is have cached movies for this hub, use them
             if (this.contentCache.movies && this.contentCache.movies[this.currentHub]) {
                 const cached = this.contentCache.movies[this.currentHub];
                 this.movieRenderer.render(cached);
@@ -249,16 +249,16 @@ class HubController {
                 return;
             }
 
-            // Cache by hub
+            // cache by hub
             if (!this.contentCache.movies) this.contentCache.movies = {};
             this.contentCache.movies[this.currentHub] = movies;
 
-            // Render
+          
             this.movieRenderer.render(movies);
             
-            console.log(`Loaded ${movies.length} movies for ${this.currentHub}`);
+            console.log(`looaded ${movies.length} movies for ${this.currentHub}`);
         } catch (error) {
-            console.error('Error loading movies:', error);
+            console.error('errr loading movies:', error);
             this.movieRenderer.renderErrorState('Failed to load movies. Please try again later.');
         }
     }
@@ -270,13 +270,13 @@ class HubController {
     async loadGamesContent() {
         if (!this.gamesContainer) return;
         
-        console.log(`Loading games for ${this.currentHub} hub...`);
+        console.log(`showinn games for ${this.currentHub} hub...`);
         
-        // Show loading state
+     
         this.gameRenderer.renderLoadingState();
         
         try {
-            // Check cache first
+           
             if (this.contentCache.games && this.contentCache.games[this.currentHub]) {
                 const cached = this.contentCache.games[this.currentHub];
                 this.gameRenderer.render(cached);
@@ -284,7 +284,7 @@ class HubController {
                 return;
             }
 
-            // Fetch mood-based games
+            
             const games = await this.rawgAPI.getMoodGames(this.currentHub, 12);
 
             if (!games || games.length === 0) {
@@ -292,17 +292,16 @@ class HubController {
                 return;
             }
 
-            // Cache by hub
+            //  by hub
             if (!this.contentCache.games) this.contentCache.games = {};
             this.contentCache.games[this.currentHub] = games;
 
-            // Render in carousel
             this.gameRenderer.render(games);
             
-            console.log(`Loaded ${games.length} games for ${this.currentHub}`);
+            console.log(`showed n loaded ${games.length} games for ${this.currentHub}`);
             
         } catch (error) {
-            console.error('Error loading games:', error);
+            console.error('error loading games:', error);
             this.gameRenderer.renderErrorState('Failed to load games. Please try again later.');
         }
     }
@@ -314,11 +313,11 @@ class HubController {
     handleLoadError(error) {
         console.error('Content loading error:', error);
         
-        // Show error message to user
+        //  error message to user
         const errorMessage = document.createElement('div');
         errorMessage.className = 'error-banner';
         errorMessage.innerHTML = `
-            <p>⚠️ Some content couldn't be loaded. Please refresh the page to try again.</p>
+            <p>Some content couldn't be loaded. Please refresh the page to try again.</p>
             <button onclick="location.reload()">Refresh</button>
         `;
         
@@ -354,7 +353,7 @@ class HubController {
     // ============================================
 
     attachEvents() {
-        // Refresh button (if exists)
+        // Refresh button 
         const refreshButton = document.querySelector('[data-action="refresh"]');
         if (refreshButton) {
             refreshButton.addEventListener('click', () => {
@@ -363,7 +362,7 @@ class HubController {
             });
         }
         
-        // Handle browser back/forward
+        // for browser back/forward
         window.addEventListener('popstate', () => {
             this.init();
         });
@@ -418,7 +417,8 @@ class HubController {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize on hub pages
+
+   
     if (document.body.classList.contains('hub-page')) {
         window.hubController = new HubController();
     }

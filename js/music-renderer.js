@@ -24,7 +24,6 @@ class MusicRenderer {
 
     render(items) {
         if (!this.container) {
-            console.error('Container not set for MusicRenderer');
             return;
         }
 

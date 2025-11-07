@@ -559,14 +559,35 @@ function initAllAnimations() {
     //  scroll behavior 
     document.querySelectorAll('a[href^="#"]:not(.nav-link)').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') return; // ignore empty anchors
+            const target = document.querySelector(href);
+            if (!target) return;
+
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
+
+          
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+           
+            const nav = document.querySelector('nav');
+            const navHeight = nav ? nav.offsetHeight : 0;
+            const targetY = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 12;
+
+            if (!prefersReduced && typeof gsap !== 'undefined' && gsap.to) {
                 gsap.to(window, {
-                    duration: 1,
-                    scrollTo: target,
-                    ease: "power3.inOut"
+                    duration: 0.75,
+                    scrollTo: { y: targetY, autoKill: true },
+                    ease: 'power2.out'
                 });
+            } else {
+               
+                try {
+                    window.scrollTo({ top: targetY, behavior: prefersReduced ? 'auto' : 'smooth' });
+                } catch (err) {
+                   
+                    window.scroll(0, targetY);
+                }
             }
         });
     });
@@ -576,7 +597,7 @@ function initAllAnimations() {
 // INITIALIZATION
 // ===========================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if GSAP is loaded
+ 
     if (typeof gsap === 'undefined') {
         console.error('GSAP not loaded.... GSAP library ???! argh');
         return;
