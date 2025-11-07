@@ -529,23 +529,25 @@ function initTextRevealAnimations() {
         // boool to true if as animated
         element.dataset.animated = 'true';
 
-        gsap.to(element.querySelectorAll('span'), {
-            scrollTrigger: {
-                trigger: element,
-                start: 'top 85%',
-                end: 'top 60%',
-                toggleActions: 'play none none reverse'
-            },
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.03,
-            ease: "power2.out",
-            from: {
+        gsap.fromTo(element.querySelectorAll('span'), 
+            {
                 opacity: 0,
                 y: 20
+            },
+            {
+                scrollTrigger: {
+                    trigger: element,
+                    start: 'top 85%',
+                    end: 'top 60%',
+                    toggleActions: 'play none none reverse'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.03,
+                ease: "power2.out"
             }
-        });
+        );
     });
 }
 
