@@ -303,13 +303,16 @@
 
             switch (this.currentMode) {
                  case 'focus':
-                    soundPath = '/assets/audio/work-complete.mp3';
+                    // student: use relative path for github pages
+                    soundPath = 'assets/audio/work-complete.mp3';
                 break;
                 case 'break':
-                    soundPath = '/assets/audio/work-complete.mp3';
+                    // student: use relative path for github pages
+                    soundPath = 'assets/audio/work-complete.mp3';
                 break;
             default:
-                    soundPath = '/assets/audio/work-complete.mp3';
+                    // student: use relative path for github pages
+                    soundPath = 'assets/audio/work-complete.mp3';
     }
 
                 // audio notification 
@@ -346,7 +349,8 @@
                 if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification('FlowState Timer', {
                         body: `${this.getModeLabel(this.currentMode)} complete!`,
-                        icon: '/assets/faviconnn.svg'
+                        //  relative path for github pages
+                        icon: 'assets/faviconnn.svg'
                     });
                 }
             }

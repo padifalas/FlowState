@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
   btn.setAttribute("title", "Back to top");
 
 
-  fetch("/assets/back-to-top.svg")
+
+  // relative path for svg so it works on github pages
+  fetch("assets/back-to-top.svg")
     .then((res) => res.text())
     .then((svg) => {
       btn.innerHTML = svg;
