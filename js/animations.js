@@ -598,12 +598,27 @@ function initAllAnimations() {
 // ===========================================
 document.addEventListener('DOMContentLoaded', function() {
  
+    const INTRO_FLAG = 'introPlayed';
+
     if (typeof gsap === 'undefined') {
         console.error('GSAP not loaded.... GSAP library ???! argh');
         return;
     }
 
-    animateIntro();
+    // check if we're on the homepage  index
+    const isHomepage = location.pathname === '/' || 
+                       location.pathname === '/index.html' || 
+                       location.pathname.endsWith('/FlowState/') ||
+                       location.pathname.endsWith('/FlowState/index.html');
+
+    if (!isHomepage || sessionStorage.getItem(INTRO_FLAG)) {
+
+        
+        initAllAnimations();
+    } else {
+        animateIntro();
+        try { sessionStorage.setItem(INTRO_FLAG, '1'); } catch (e) {  }
+    }
 });
 
 
