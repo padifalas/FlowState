@@ -205,7 +205,6 @@
         </div>
         
         <form class="contact-form-modal" id="contact-form-modal" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
-<form class="contact-form-modal" id="contact-form-modal" action="https://formspree.io/f/xjkpreqy" method="POST" novalidate>
     
     <div class="form-row">
         <div class="form-group">
@@ -271,6 +270,15 @@
     </div>
 
     <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+    <!-- Submission feedback (toggled by contact.js) -->
+    <div class="form-success" hidden role="status" aria-live="polite">
+        <p>Thanks! Your message was sent.</p>
+    </div>
+    <div class="form-failure" hidden role="alert" aria-live="assertive">
+        <p>Sorry, something went wrong. Please try again later.</p>
+    </div>
+
     <button type="submit" class="form-submit">Send Message</button>
 </form>
 

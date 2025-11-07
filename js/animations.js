@@ -9,9 +9,14 @@ const PARTICLE_CONFIG = {
 
 // ===========================================
 
-//  GSAP plugins  registered 
-if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
+//  GSAP plugins registered
+if (typeof gsap !== 'undefined') {
+    if (typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+    }
+    if (typeof MotionPathPlugin !== 'undefined') {
+        gsap.registerPlugin(MotionPathPlugin);
+    }
 }
 // INTRO LOADER ANIMATION
 // ===========================================
@@ -306,16 +311,15 @@ function initHeroAnimation() {
             ease: "elastic.out(1, 0.5)",
             delay: 1.5
         });
-        
-        //  animation for CTA doent workkkkk fuck
-        // gsap.to(heroCta, {
-        //     y: -10,
-        //     duration: 2,
-        //     ease: "sine.inOut",
-        //     yoyo: true,
-        //     repeat: -1,
-        //     delay: 2.5
-        // });
+    // Optional subtle float animation for CTA (disabled by default)
+    // gsap.to(heroCta, {
+    //     y: -10,
+    //     duration: 2,
+    //     ease: "sine.inOut",
+    //     yoyo: true,
+    //     repeat: -1,
+    //     delay: 2.5
+    // });
     }
     
     // scroll indicator animation
@@ -328,14 +332,16 @@ function initHeroAnimation() {
         }, "-=0.4");
     }
 
-    // continuouus scroll indicator animation
-    gsap.to('.hero__scroll-arrow', {
-        y: 5,
-        duration: 1,
-        ease: "power1.inOut",
-        yoyo: true,
-        repeat: -1
-    });
+    // Continuous scroll indicator animation fallback (MotionPath handled in initSVGAnimations)
+    if (typeof MotionPathPlugin === 'undefined') {
+        gsap.to('.hero__scroll-arrow', {
+            y: 5,
+            duration: 1,
+            ease: "power1.inOut",
+            yoyo: true,
+            repeat: -1
+        });
+    }
 }
 
 // ===========================================
@@ -421,13 +427,22 @@ function initScrollAnimations() {
 function initSVGAnimations() {
     //  scroll indicator arrow anima
     const scrollArrow = document.querySelector('.hero__scroll-arrow');
-    if (scrollArrow) {
+    if (scrollArrow && typeof gsap !== 'undefined' && typeof MotionPathPlugin !== 'undefined') {
         gsap.to(scrollArrow, {
-            y: 5,
-            duration: 0.6,
-            ease: "power2.inOut",
+            duration: 2,
+            ease: "sine.inOut",
+            repeat: -1,
             yoyo: true,
-            repeat: -1
+            motionPath: {
+                path: [
+                    { x: 0, y: 0 },
+                    { x: 3, y: 6 },
+                    { x: 0, y: 12 },
+                    { x: -3, y: 6 },
+                    { x: 0, y: 0 }
+                ],
+                autoRotate: false
+            }
         });
     }
 
@@ -576,7 +591,7 @@ function initAllAnimations() {
             const navHeight = nav ? nav.offsetHeight : 0;
             const targetY = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 12;
 
-            if (!prefersReduced && typeof gsap !== 'undefined' && gsap.to) {
+            if (!prefersReduced && typeof gsap !== 'undefined' && gsap.to && typeof ScrollToPlugin !== 'undefined') {
                 gsap.to(window, {
                     duration: 0.75,
                     scrollTo: { y: targetY, autoKill: true },
