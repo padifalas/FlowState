@@ -23,10 +23,6 @@ class Navigation {
         return page.replace('.html', '') || 'index';
     }
 
-    /**
-     * detec which level we're at based on folder structure
-     * returnsns: 'root', 'hubs', or 'nested-hubs'
-     */
     detectPageLevel() {
         const path = window.location.pathname;
         const url = window.location.href;
@@ -34,13 +30,11 @@ class Navigation {
         console.log('[Navigation] Full pathname:', path);
         console.log('[Navigation] Full URL:', url);
         
-        // check if we're in a hub folder
         const isInHubFolder = path.includes('/hubs/') || 
                              path.includes('\\hubs\\') ||
                              url.includes('/hubs/');
         
         if (isInHubFolder) {
-           
             const hubPath = path.split('/hubs/')[1] || path.split('\\hubs\\')[1];
             if (hubPath) {
                 const depth = hubPath.split(/[/\\]/).filter(Boolean).length;
@@ -55,7 +49,6 @@ class Navigation {
             return 'hubs';
         }
         
-        // will chec if we're at root level but accessing a hub file directly
         const filename = path.split('/').pop() || '';
         const hubFiles = [
             'focus.html', 'relax.html', 'energize.html', 'creative.html', 'melancholy.html',
@@ -71,7 +64,6 @@ class Navigation {
         return 'root';
     }
 
-
     getRelativePrefix() {
         const pageLevel = this.detectPageLevel();
         
@@ -79,17 +71,14 @@ class Navigation {
         
         switch (pageLevel) {
             case 'nested-hubs':
-               
                 return '../../';
             case 'hubs':
-               
                 return '../';
             case 'root':
             default:
                 return '';
         }
     }
-
 
     isHomepage() {
         const filename = window.location.pathname.split('/').pop() || '';
@@ -113,11 +102,9 @@ class Navigation {
         console.log('[Navigation] Is Homepage?', isHomepage);
         console.log('[Navigation] Relative Prefix:', relPrefix || '(none - at root)');
 
-       
         let navLinks;
         
         if (isHomepage) {
-         
             navLinks = [
                 { name: 'Home', href: '#home', id: 'home', isAnchor: true },
                 { name: 'About', href: '#about', id: 'about', isAnchor: true },
@@ -125,7 +112,6 @@ class Navigation {
                 { name: 'Contact', href: 'contact.html', id: 'contact', isAnchor: false }
             ];
         } else {
-            
             navLinks = [
                 { 
                     name: 'Home', 
@@ -154,7 +140,6 @@ class Navigation {
             ];
         }
 
-      
         const logoHref = relPrefix ? `${relPrefix}index.html` : 'index.html';
         const logoSrc = relPrefix ? `${relPrefix}assets/logo.svg` : 'assets/logo.svg';
 
@@ -167,7 +152,6 @@ class Navigation {
                          onerror="console.error('Logo failed to load from:', this.src); this.style.display='none';">
                 </a>
 
-                <!-- Mobile toggle -->
                 <button class="nav-toggle" 
                         aria-expanded="false" 
                         aria-controls="nav-links-list" 
@@ -199,25 +183,20 @@ class Navigation {
 
         this.navElement.innerHTML = navHTML;
         
-        
-        console.log('[Navigation] generatedd links:', navLinks.map(l => `${l.name}: ${l.href}`));
+        console.log('[Navigation] Generated links:', navLinks.map(l => `${l.name}: ${l.href}`));
     }
 
- 
     isLinkActive(linkId) {
         const currentPage = this.currentPage;
         
-        // home
         if (linkId === 'home' && (currentPage === 'index' || currentPage === '')) {
             return true;
         }
         
-        // conta page
         if (linkId === 'contact' && currentPage === 'contact') {
             return true;
         }
         
-        // hubb pages - check for both naming conventions
         const hubPages = [
             'creative-hub', 'energize-hub', 'focus-hub', 'melancholy-hub', 'relax-hub',
             'creative', 'energize', 'focus', 'melancholy', 'relax'
@@ -236,7 +215,6 @@ class Navigation {
             link.addEventListener('mouseenter', this.handleLinkHover);
             link.addEventListener('mouseleave', this.handleLinkLeave);
 
-           
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
                 const isAnchor = link.getAttribute('data-is-anchor') === 'true';
@@ -245,7 +223,6 @@ class Navigation {
 
                 console.log('[Navigation] Link clicked:', href, 'Is anchor?', isAnchor);
 
-             
                 if (isMobileMenuOpen) {
                     e.preventDefault();
                     this.closeMobileMenu();
@@ -259,15 +236,12 @@ class Navigation {
                         }
                     }, 300);
                 } else if (isAnchor) {
-                   
                     e.preventDefault();
                     this.scrollToAnchor(href);
                 }
-                
             });
         });
 
-      
         const toggle = this.navElement.querySelector('.nav-toggle');
         if (toggle) {
             toggle.addEventListener('click', (e) => {
@@ -276,7 +250,6 @@ class Navigation {
             });
         }
 
-       
         window.addEventListener('resize', () => {
             const mobileList = this.navElement.querySelector('.nav-links');
             if (mobileList && mobileList.classList.contains('open')) {
@@ -284,7 +257,6 @@ class Navigation {
             }
         });
     }
-
 
     scrollToAnchor(href) {
         const targetId = href.includes('#') ? href.split('#')[1] : href.substring(1);
@@ -319,7 +291,6 @@ class Navigation {
         const mobileList = this.navElement.querySelector('.nav-links');
         if (!mobileList) return;
 
-     
         let overlay = document.getElementById('nav-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -337,24 +308,20 @@ class Navigation {
             if (firstLink) firstLink.focus();
         }
 
-     
         document.body.style.overflow = 'hidden';
         document.body.classList.add('menu-open');
 
-       
         const items = Array.from(mobileList.querySelectorAll('.nav-item'));
         items.forEach((it, i) => {
             const delay = i * 45;
             it.style.transitionDelay = `${delay}ms`;
         });
 
-       
         overlay.addEventListener('click', this._overlayClickHandler = (e) => {
             e.preventDefault();
             this.closeMobileMenu();
         });
 
-       
         this._mobileKeydownHandler = this._handleMobileKeydown.bind(this);
         document.addEventListener('keydown', this._mobileKeydownHandler);
     }
@@ -371,7 +338,6 @@ class Navigation {
             toggle.focus();
         }
 
-     
         const overlay = document.getElementById('nav-overlay');
         if (overlay) {
             overlay.classList.remove('is-visible');
@@ -382,15 +348,12 @@ class Navigation {
             this._overlayClickHandler = null;
         }
 
-       
         document.body.style.overflow = '';
         document.body.classList.remove('menu-open');
 
-        
         const items = mobileList.querySelectorAll('.nav-item');
         items.forEach(it => { it.style.transitionDelay = ''; });
 
-      
         if (this._mobileKeydownHandler) {
             document.removeEventListener('keydown', this._mobileKeydownHandler);
             this._mobileKeydownHandler = null;
@@ -447,246 +410,163 @@ class Navigation {
 }
 
 // ============================================
-// MOOD HUBS CAROUSEL
+// MOOD HUBS HORIZONTAL SCROLL
 // ============================================
 
-class MoodHubsCarousel {
+class MoodHubsScroll {
     constructor() {
-        this.track = document.getElementById('mood-hubs-track');
-        this.prevBtn = document.getElementById('carousel-prev');
-        this.nextBtn = document.getElementById('carousel-next');
-        this.dotsContainer = document.getElementById('carousel-dots');
+        this.container = document.getElementById('mood-hubs-scroll-container');
+        this.scrollIndicator = document.getElementById('scroll-progress-indicator');
+        this.scrollHint = document.querySelector('.scroll-hint');
         
-        if (!this.track) return;
+        if (!this.container) return;
 
-        this.cards = Array.from(this.track.children);
-        this.currentIndex = 0;
-        this.cardsPerView = this.getCardsPerView();
-        this.totalSlides = Math.ceil(this.cards.length / this.cardsPerView);
+        this.isDragging = false;
+        this.startX = 0;
+        this.scrollLeft = 0;
+        this.velocity = 0;
         
         this.init();
     }
 
-    getCardsPerView() {
-        const width = window.innerWidth;
-        if (width >= 1024) return 3;
-        if (width >= 768) return 2;
-        return 1;
-    }
-
     init() {
-        this.createDots();
-        this.updateCarousel();
-        this.attachEvents();
+        this.updateScrollIndicator();
+        this.attachScrollListener();
+        this.attachMouseDrag();
+        this.attachTouchSupport();
+        this.attachKeyboardNav();
         
-        window.addEventListener('resize', this.handleResize.bind(this));
-    }
-
-    createDots() {
-        if (!this.dotsContainer) return;
-
-        this.dotsContainer.innerHTML = '';
-        
-        for (let i = 0; i < this.totalSlides; i++) {
-            const dot = document.createElement('button');
-            dot.classList.add('carousel-dot');
-            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-            dot.setAttribute('role', 'tab');
-            dot.dataset.index = i;
-            
-            if (i === 0) {
-                dot.classList.add('active');
-                dot.setAttribute('aria-selected', 'true');
-            } else {
-                dot.setAttribute('aria-selected', 'false');
+        // Hide scroll hint after first interaction
+        const hideHint = () => {
+            if (this.scrollHint) {
+                this.scrollHint.style.opacity = '0';
+                setTimeout(() => {
+                    if (this.scrollHint) this.scrollHint.style.display = 'none';
+                }, 300);
             }
-            
-            this.dotsContainer.appendChild(dot);
-        }
+        };
+        
+        this.container.addEventListener('scroll', hideHint, { once: true });
+        this.container.addEventListener('mousedown', hideHint, { once: true });
+        this.container.addEventListener('touchstart', hideHint, { once: true });
     }
 
-    attachEvents() {
-        // prev button
-        if (this.prevBtn) {
-            this.prevBtn.addEventListener('click', () => this.prev());
-        }
+    attachScrollListener() {
+        this.container.addEventListener('scroll', () => {
+            this.updateScrollIndicator();
+        });
+    }
 
-        // next btn
-        if (this.nextBtn) {
-            this.nextBtn.addEventListener('click', () => this.next());
-        }
+    updateScrollIndicator() {
+        if (!this.scrollIndicator) return;
 
-     
-        if (this.dotsContainer) {
-            this.dotsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('carousel-dot')) {
-                    const index = parseInt(e.target.dataset.index);
-                    this.goToSlide(index);
-                }
-            });
-        }
+        const scrollLeft = this.container.scrollLeft;
+        const scrollWidth = this.container.scrollWidth - this.container.clientWidth;
+        const scrollPercentage = scrollWidth > 0 ? (scrollLeft / scrollWidth) * 100 : 0;
 
-        
-        this.track.addEventListener('keydown', (e) => {
+        this.scrollIndicator.style.width = `${scrollPercentage}%`;
+    }
+
+    attachMouseDrag() {
+        this.container.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.startX = e.pageX - this.container.offsetLeft;
+            this.scrollLeft = this.container.scrollLeft;
+            this.container.style.cursor = 'grabbing';
+            this.container.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - this.container.offsetLeft;
+            const walk = (x - this.startX) * 2; // Scroll speed multiplier
+            this.container.scrollLeft = this.scrollLeft - walk;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (this.isDragging) {
+                this.isDragging = false;
+                this.container.style.cursor = 'grab';
+                this.container.style.userSelect = '';
+            }
+        });
+
+        this.container.addEventListener('mouseleave', () => {
+            if (this.isDragging) {
+                this.isDragging = false;
+                this.container.style.cursor = 'grab';
+                this.container.style.userSelect = '';
+            }
+        });
+    }
+
+    attachTouchSupport() {
+        let touchStartX = 0;
+        let touchStartScrollLeft = 0;
+
+        this.container.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartScrollLeft = this.container.scrollLeft;
+        }, { passive: true });
+
+        this.container.addEventListener('touchmove', (e) => {
+            const touchX = e.touches[0].clientX;
+            const diff = touchStartX - touchX;
+            this.container.scrollLeft = touchStartScrollLeft + diff;
+        }, { passive: true });
+    }
+
+    attachKeyboardNav() {
+        this.container.addEventListener('keydown', (e) => {
+            const scrollAmount = 300;
+            
             if (e.key === 'ArrowLeft') {
-                this.prev();
+                e.preventDefault();
+                this.smoothScrollBy(-scrollAmount);
             } else if (e.key === 'ArrowRight') {
-                this.next();
-            }
-        });
-
-      
-        this.addSwipeSupport();
-    }
-
-    addSwipeSupport() {
-        let startX = 0;
-        let currentX = 0;
-        let isDragging = false;
-
-        this.track.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-        }, { passive: true });
-
-        this.track.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            currentX = e.touches[0].clientX;
-        }, { passive: true });
-
-        this.track.addEventListener('touchend', () => {
-            if (!isDragging) return;
-            
-            const diff = startX - currentX;
-            const threshold = 50;
-
-            if (Math.abs(diff) > threshold) {
-                if (diff > 0) {
-                    this.next();
-                } else {
-                    this.prev();
-                }
-            }
-
-            isDragging = false;
-        });
-    }
-
-    prev() {
-        if (this.currentIndex > 0) {
-            this.currentIndex--;
-            this.updateCarousel();
-        }
-    }
-
-    next() {
-        if (this.currentIndex < this.totalSlides - 1) {
-            this.currentIndex++;
-            this.updateCarousel();
-        }
-    }
-
-    goToSlide(index) {
-        this.currentIndex = index;
-        this.updateCarousel();
-    }
-
-    updateCarousel() {
-        const cardWidth = this.cards[0].offsetWidth;
-        const gap = parseFloat(getComputedStyle(this.track).gap) || 0;
-        const translateX = -(this.currentIndex * (cardWidth + gap) * this.cardsPerView);
-        
-        if (typeof gsap !== 'undefined') {
-            gsap.to(this.track, {
-                x: translateX,
-                duration: 0.5,
-                ease: 'power2.out'
-            });
-        } else {
-            this.track.style.transform = `translateX(${translateX}px)`;
-        }
-        
-        this.updateButtons();
-        this.updateDots();
-        
-        this.track.setAttribute('aria-live', 'polite');
-    }
-
-    updateButtons() {
-        if (!this.prevBtn || !this.nextBtn) return;
-
-        
-        if (this.currentIndex === 0) {
-            this.prevBtn.disabled = true;
-            this.prevBtn.style.opacity = '0';
-            this.prevBtn.style.pointerEvents = 'none';
-        } else {
-            this.prevBtn.disabled = false;
-            this.prevBtn.style.opacity = '1';
-            this.prevBtn.style.pointerEvents = 'auto';
-        }
-
-       
-        if (this.currentIndex >= this.totalSlides - 1) {
-            this.nextBtn.disabled = true;
-            this.nextBtn.style.opacity = '0';
-            this.nextBtn.style.pointerEvents = 'none';
-        } else {
-            this.nextBtn.disabled = false;
-            this.nextBtn.style.opacity = '1';
-            this.nextBtn.style.pointerEvents = 'auto';
-        }
-    }
-
-    updateDots() {
-        if (!this.dotsContainer) return;
-
-        const dots = this.dotsContainer.querySelectorAll('.carousel-dot');
-        dots.forEach((dot, index) => {
-            if (index === this.currentIndex) {
-                dot.classList.add('active');
-                dot.setAttribute('aria-selected', 'true');
-            } else {
-                dot.classList.remove('active');
-                dot.setAttribute('aria-selected', 'false');
+                e.preventDefault();
+                this.smoothScrollBy(scrollAmount);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                this.smoothScrollTo(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                this.smoothScrollTo(this.container.scrollWidth);
             }
         });
     }
 
-    handleResize() {
-        const newCardsPerView = this.getCardsPerView();
-        
-        if (newCardsPerView !== this.cardsPerView) {
-            this.cardsPerView = newCardsPerView;
-            this.totalSlides = Math.ceil(this.cards.length / this.cardsPerView);
-            
-            
-            if (this.currentIndex >= this.totalSlides) {
-                this.currentIndex = this.totalSlides - 1;
-            }
-            
-            this.createDots();
-            this.updateCarousel();
-        } else {
-            this.updateCarousel();
-        }
+    smoothScrollBy(amount) {
+        this.container.scrollBy({
+            left: amount,
+            behavior: 'smooth'
+        });
+    }
+
+    smoothScrollTo(position) {
+        this.container.scrollTo({
+            left: position,
+            behavior: 'smooth'
+        });
     }
 }
 
 // ============================================
-// INITT ON DOM LOAD
+// INIT ON DOM LOAD
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // init Navigation
+    // Init Navigation
     new Navigation();
     
-  
-    if (document.getElementById('mood-hubs-track')) {
-        new MoodHubsCarousel();
+    // Init Mood Hubs Scroll
+    if (document.getElementById('mood-hubs-scroll-container')) {
+        new MoodHubsScroll();
     }
 });
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { Navigation, MoodHubsCarousel };
+    module.exports = { Navigation, MoodHubsScroll };
 }

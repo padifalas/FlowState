@@ -565,46 +565,70 @@ margin-left: 0;
     position: relative;
 }
 
-
-
 .mood-hubs-container {
-    max-width: var(--container-max);
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 var(--container-padding);
 }
 
-.mood-hubs-carousel {
+.mood-hubs__header {
+    max-width: var(--container-max);
+    margin: 0 auto var(--space-lg);
+    text-align: center;
+}
+
+/* Scroll Container */
+.mood-hubs-scroll-wrapper {
     position: relative;
-    overflow: visible;
+    width: 100%;
 }
 
-.mood-hubs-track {
+.mood-hubs-scroll-container {
     display: flex;
-    gap: 2vw;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 2vw 0;
+    gap: 2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    cursor: grab;
+    padding: 2rem 0;
+    margin: 0 -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    
+    /* Hide scrollbar for cleaner look */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
 
+.mood-hubs-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.mood-hubs-scroll-container:active {
+    cursor: grabbing;
+}
+
+/* Hub Cards */
 .hub-card {
     position: relative;
     background: var(--color-text-primary);
-    border-radius: 1.5vw;
-    padding: 1.5vw 1.5vw;
-    min-height: 18vw;
-    flex: 0 0 calc(33.333% - 1.35vw);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    min-height: 420px;
+    min-width: 320px;
+    max-width: 380px;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
     transition: all var(--transition-slow);
-    cursor: pointer;
     will-change: transform;
 }
 
-
 .hub-card:hover {
-    transform: translateY(-0.8vw) rotate(0deg) !important;
-    box-shadow: 0 1.5vw 4vw rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     z-index: 10;
 }
 
@@ -628,6 +652,58 @@ margin-left: 0;
 .hub-card[data-hub="melancholy"] {
     transform: rotate(-1.2deg);
 }
+
+.hub-card:hover[data-hub] {
+    transform: translateY(-8px) scale(1.02) rotate(0deg) !important;
+}
+
+/* Scroll Progress Indicator */
+.scroll-progress {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: var(--space-md) auto 0;
+    height: 4px;
+    background: rgba(240, 236, 217, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.scroll-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-red), var(--color-accent-coral));
+    border-radius: 2px;
+    transition: width 0.2s ease;
+    box-shadow: 0 0 10px rgba(217, 53, 53, 0.5);
+}
+
+/* Scroll Hint */
+.scroll-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: var(--space-md);
+    color: var(--color-text-secondary);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 1;
+    transition: opacity var(--transition-base);
+}
+
+.scroll-hint-icon {
+    width: 24px;
+    height: 24px;
+    animation: slideHorizontal 2s ease-in-out infinite;
+}
+
+@keyframes slideHorizontal {
+    0%, 100% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+}
+
 
 /* Carousel Controls */
 .carousel-controls {
@@ -691,13 +767,13 @@ margin-left: 0;
 
 /* Hub Card Header */
 .hub-card__number {
-    font-size: 0.85vw;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--color-bg-secondary);
     opacity: 0.4;
     font-family: var(--font-mono);
     text-transform: uppercase;
-    margin-bottom: 0.4vw;
+    margin-bottom: 0.5rem;
 }
 
 .hub-card__content {
@@ -706,47 +782,46 @@ margin-left: 0;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    min-height: 7vw;
+    min-height: 80px;
     text-align: center;
 }
 
 .hub-card__title {
     font-family: var(--font-title);
-    font-size: clamp(1.25rem, 2vw, 2.5rem);
+    font-size: clamp(1.5rem, 2vw, 2rem);
     color: var(--color-bg-secondary);
-    margin-bottom: 1vw;
+    margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     line-height: 1.1;
 }
 
-/* Hub Card Description Area */
 .hub-card__description {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vw;
+    gap: 1rem;
     margin-top: auto;
 }
 
 .hub-card__icon {
-    width: 18vw;
-    height: 18vw;
+    width: 140px;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2.5vw;
+    margin-bottom: 1rem;
 }
 
 .hub-card__icon img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    max-width: 17vw;
-    max-height: 17vw;
-    filter: drop-shadow(0 0 2vw var(--hub-icon-glow, var(--color-accent-red)));
+    filter: drop-shadow(0 0 16px var(--hub-icon-glow, var(--color-accent-red)));
     transition: filter 0.3s;
 }
+
+
 /* Hub icon aura accent colors */
 .hub-card[data-hub="focus"] .hub-card__icon img {
     --hub-icon-glow: var(--color-accent-red);
@@ -770,30 +845,30 @@ margin-left: 0;
     line-height: 1.5;
     min-height: 4.5vw;
     text-align: center;
-    padding: 0 0.5vw;
+    padding: 0 0.5rem;
 }
 
 .hub-card__link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4vw;
-    padding: 0.8vw 1.5vw;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
     background: var(--color-bg-secondary);
     color: var(--color-text-primary);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: clamp(0.7rem, 0.85vw, 0.95rem);
+    font-size: 0.9rem;
     letter-spacing: 0.05em;
     border-radius: 0.5vw;
     transition: all var(--transition-base);
-    margin-top: 0.8vw;
+    margin-top: 1rem;
     width: fit-content;
 }
 
 .hub-card__link:hover {
     background: var(--color-bg-primary);
-    transform: translateX(0.3vw);
+    transform: translateX(4px);
 }
 
 .hub-card__arrow {
@@ -803,8 +878,109 @@ margin-left: 0;
 }
 
 .hub-card__link:hover .hub-card__arrow {
-    transform: translateX(0.3vw);
+    transform: translateX(4px);
 }
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .hub-card {
+        min-width: 300px;
+        max-width: 350px;
+        min-height: 400px;
+    }
+    
+    .hub-card__icon {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mood-hubs {
+        padding: var(--space-xl) 0;
+    }
+    
+    .mood-hubs-scroll-container {
+        gap: 1.5rem;
+        cursor: default; /* Touch devices don't need grab cursor */
+    }
+    
+    .hub-card {
+        min-width: 280px;
+        max-width: 320px;
+        min-height: 380px;
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .hub-card__icon {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .scroll-hint-icon {
+        animation: none; /* Disable animation on mobile */
+    }
+    
+    /* Show scroll hint text only on mobile */
+    .scroll-hint {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mood-hubs-scroll-container {
+        gap: 1rem;
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .hub-card {
+        min-width: 260px;
+        max-width: 280px;
+        min-height: 360px;
+        padding: 1.25rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .hub-card__title {
+        font-size: 1.35rem;
+    }
+    
+    .hub-card__icon {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .hub-card__text {
+        font-size: 0.9rem;
+    }
+    
+    .hub-card__link {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .mood-hubs-scroll-container {
+        scroll-behavior: auto;
+    }
+    
+    .hub-card {
+        transition: none;
+    }
+    
+    .scroll-hint-icon {
+        animation: none;
+    }
+}
+
+
 
 /* Hub specific accent colors for icons/numbers */
 .hub-card[data-hub="focus"] .hub-card__number,
