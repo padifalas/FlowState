@@ -33,6 +33,10 @@ class HubController {
             console.warn('RAWG API key not found');
         }
         this.rawgAPI = new RAWGAPI(rawgKey);
+        
+        //  API for Wordle & Sudoku games
+        this.puzzleAPI = new PuzzleAPI();
+        
         this.gameRenderer = new GameRenderer();
         
         // cahce for loaded content
@@ -57,7 +61,7 @@ class HubController {
             return hubAttribute;
         }
 
-        // Fallback: detect from URL
+      // Fallback: detect from URL
         const path = window.location.pathname;
         if (path.includes('focus')) return 'focus';
         if (path.includes('relax')) return 'relax';
@@ -65,7 +69,7 @@ class HubController {
         if (path.includes('creative')) return 'creative';
         if (path.includes('melancholy')) return 'melancholy';
         
-        return 'focus'; // Default
+        return 'focus'; 
     }
 
     // ============================================
@@ -89,7 +93,7 @@ class HubController {
     }
 
     // ============================================
-    // SETUP CONTAINERS
+    //  CONTAINERS
     // ============================================
 
     setupContainers() {
@@ -147,7 +151,7 @@ class HubController {
       
         this.toggleSections(filter);
         
-        // Animate transition
+ 
         this.animateFilterChange();
     }
 
@@ -272,7 +276,6 @@ class HubController {
         
         console.log(`showinn games for ${this.currentHub} hub...`);
         
-     
         this.gameRenderer.renderLoadingState();
         
         try {
@@ -284,21 +287,34 @@ class HubController {
                 return;
             }
 
-            
-            const games = await this.rawgAPI.getMoodGames(this.currentHub, 12);
+        
+            const [rawgGames, puzzleGames] = await Promise.all([
+                this.rawgAPI.getMoodGames(this.currentHub, 8).catch(err => {
+                    console.warn('RAWG api dont work, using fallback:', err);
+                    return [];
+                }),
+                this.puzzleAPI.getPuzzleGames(this.currentHub, 6).catch(err => {
+                    console.warn('Puzzle API failed, using fallback:', err);
+                    return [];
+                })
+            ]);
 
-            if (!games || games.length === 0) {
+            // Combine and shuffle games (puzzles first to ensure they appear)
+            const allGames = [...puzzleGames, ...rawgGames];
+            const shuffledGames = this.shuffleArray(allGames);
+
+            if (shuffledGames.length === 0) {
                 this.gameRenderer.renderEmptyState();
                 return;
             }
 
             //  by hub
             if (!this.contentCache.games) this.contentCache.games = {};
-            this.contentCache.games[this.currentHub] = games;
+            this.contentCache.games[this.currentHub] = shuffledGames;
 
-            this.gameRenderer.render(games);
+            this.gameRenderer.render(shuffledGames);
             
-            console.log(`showed n loaded ${games.length} games for ${this.currentHub}`);
+            console.log(`Loaded ${shuffledGames.length} games (${puzzleGames.length} puzzles + ${rawgGames.length} RAWG) for ${this.currentHub}`);
             
         } catch (error) {
             console.error('error loading games:', error);
@@ -384,6 +400,7 @@ class HubController {
     clearAllCaches() {
         this.deezerAPI.clearCache();
         this.rawgAPI.clearCache();
+        this.puzzleAPI.clearCache();
         this.contentCache = {
             music: null,
             movies: null,
@@ -395,18 +412,18 @@ class HubController {
     // PUBLIC API
     // ============================================
 
-    // Refresh all content
+
     async refresh() {
         this.clearAllCaches();
         await this.loadContent();
     }
 
-    // Get current hub name
+ 
     getHubName() {
         return this.currentHub;
     }
 
-    // Get current filter
+ 
     getCurrentFilter() {
         return this.currentFilter;
     }
